@@ -209,42 +209,48 @@ export default function App() {
             <StaffDashboard activeTab={activeTab} setActiveTab={setActiveTab} />
           ) : (
             <>
-              {/* Deel-style Hero Welcome Banner featuring Seamless African Workforce Showcase */}
-          <div className="hero-card">
+              {/* Base Network Web3 Rebranded Hero Welcome Banner */}
+          <div className="hero-card" style={{
+            background: 'linear-gradient(135deg, #f0f5ff 0%, #ffffff 50%, #e0f2fe 100%)',
+            border: '1px solid #c7d2fe',
+            boxShadow: '0 8px 32px -4px rgba(0, 82, 255, 0.12)'
+          }}>
             <div className="hero-text-side">
-              <div className="hero-welcome-badge">
-                <Bot size={16} /> Autonomous Payroll Engine
+              <div className="hero-welcome-badge" style={{ background: '#e0e7ff', color: '#0052ff', borderColor: '#a5b4fc' }}>
+                <Zap size={16} color="#0052ff" /> Base Network Web3 Autonomous Payroll Active
               </div>
               <h1 className="hero-heading" style={{ 
-                fontSize: '2.5rem', 
+                fontSize: '2.55rem', 
                 fontWeight: 800, 
                 lineHeight: 1.15,
                 letterSpacing: '-0.03em', 
                 color: '#0f172a',
                 fontFamily: "'Plus Jakarta Sans', sans-serif"
               }}>
-                Pay your African team in seconds.{' '}
+                Instant African workforce payroll on{' '}
                 <span style={{ 
                   color: '#38bdf8'
                 }}>
-                  Local rails or Base USDC.
+                  Base Network USDC.
                 </span>
               </h1>
-              <p className="hero-subtext" style={{ fontSize: '1.05rem', lineHeight: 1.5, color: '#475569', margin: '16px 0 26px 0', fontWeight: 500 }}>
-                Automate salaries, statutory taxes, and cross-border contractor payouts across Nigeria, Ghana, and Kenya with zero payment friction.
+              <p className="hero-subtext" style={{ fontSize: '1.05rem', lineHeight: 1.5, color: '#475569', margin: '16px 0 24px 0', fontWeight: 500 }}>
+                Automate salaries, statutory tax withholdings, and cross-border contractor payouts using batch disburser smart contracts on Base with &lt; $0.01 gas fees.
               </p>
               <div className="hero-actions">
                 <button 
                   className="btn-primary"
                   onClick={() => setActiveTab("payroll")}
+                  style={{ background: '#0052ff', borderColor: '#0052ff', boxShadow: '0 4px 14px rgba(0, 82, 255, 0.3)' }}
                 >
-                  <Banknote size={18} /> Execute Payroll Run
+                  <Banknote size={18} /> Execute Base Payroll Run
                 </button>
                 <button 
                   className="btn-secondary"
-                  onClick={() => setActiveTab("people")}
+                  onClick={() => setActiveTab("base-usdc")}
+                  style={{ borderColor: '#a5b4fc', color: '#0052ff' }}
                 >
-                  <Users size={18} /> Workforce Queue ({workers.length})
+                  <Wallet size={18} /> Base Network Contract (0x4f82...7d11)
                 </button>
               </div>
             </div>
@@ -260,7 +266,7 @@ export default function App() {
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'radial-gradient(circle at center bottom, rgba(56, 189, 248, 0.25) 0%, rgba(255, 255, 255, 0) 70%)',
+                background: 'radial-gradient(circle at center bottom, rgba(0, 82, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%)',
                 pointerEvents: 'none',
                 zIndex: 0
               }} />
@@ -269,10 +275,10 @@ export default function App() {
                 alt="African Workforce Team 1" 
                 className="african-hero-img" 
                 style={{ 
-                  height: '240px', 
+                  height: '250px', 
                   position: 'relative',
                   zIndex: 2,
-                  filter: 'drop-shadow(0 14px 20px rgba(2, 132, 199, 0.15))' 
+                  filter: 'drop-shadow(0 14px 22px rgba(0, 82, 255, 0.18))' 
                 }}
               />
               <img 
@@ -280,20 +286,20 @@ export default function App() {
                 alt="African Workforce Team 2" 
                 className="african-hero-img" 
                 style={{ 
-                  height: '220px', 
+                  height: '230px', 
                   marginLeft: '-40px',
                   position: 'relative',
                   zIndex: 1,
-                  filter: 'drop-shadow(0 10px 15px rgba(2, 132, 199, 0.12))' 
+                  filter: 'drop-shadow(0 10px 16px rgba(0, 82, 255, 0.14))' 
                 }}
               />
             </div>
           </div>
 
-          {/* Seamless Pan-African Workforce Showcase Bar */}
+          {/* Base Web3 Rebranded Showcase Bar */}
           <div style={{ 
-            background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)', 
-            border: '1px solid var(--primary-200)', 
+            background: 'linear-gradient(135deg, #ffffff 0%, #f0f5ff 100%)', 
+            border: '1px solid #c7d2fe', 
             borderRadius: 'var(--radius-lg)', 
             padding: '16px 24px', 
             marginBottom: '28px',
@@ -307,7 +313,7 @@ export default function App() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
               <div style={{
                 position: 'relative',
-                background: 'radial-gradient(circle, rgba(186, 230, 253, 0.4) 0%, rgba(255,255,255,0) 70%)',
+                background: 'radial-gradient(circle, rgba(199, 210, 254, 0.5) 0%, rgba(255,255,255,0) 70%)',
                 padding: '6px 12px',
                 borderRadius: '16px'
               }}>
@@ -317,21 +323,21 @@ export default function App() {
                   style={{ 
                     height: '100px', 
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 8px 12px rgba(2, 132, 199, 0.12))'
+                    filter: 'drop-shadow(0 8px 14px rgba(0, 82, 255, 0.15))'
                   }}
                 />
               </div>
               <div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
-                  Pan-African Workforce Orchestration Platform
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  Base Network Web3 Disburser Active <span style={{ background: '#0052ff', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>Base Mainnet</span>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>
-                  Cross-border workforce payments across Nigerian NIP, Ghana Mobile Money & Base Network.
+                  Settling African workforce salaries via automated USDC smart contracts with sub-cent gas fees.
                 </div>
               </div>
             </div>
-            <span className="status-tag verified" style={{ fontSize: '0.85rem', padding: '8px 16px', background: '#e0f2fe', color: '#0369a1' }}>
-              <ShieldCheck size={16} /> Tax & Policy Compliant
+            <span className="status-tag verified" style={{ fontSize: '0.85rem', padding: '8px 16px', background: '#e0e7ff', color: '#0052ff' }}>
+              <ShieldCheck size={16} /> Web3 Smart Contract Verified
             </span>
           </div>
 

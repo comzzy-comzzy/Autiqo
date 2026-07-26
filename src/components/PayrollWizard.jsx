@@ -111,7 +111,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
             <Wallet size={22} color="#0052ff" /> Base Smart Contract Automated Payroll Engine
           </h2>
           <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-            Automated USDC batch salary disbursement deployed on Base Network (`0x4f82...7d11`).
+            Automated USDC batch salary disbursement deployed on Base Network ('0x4f82...7d11').
           </p>
         </div>
         <button 
@@ -280,7 +280,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
               <Code size={18} color="#0052ff" /> Base Network Automated Smart Contract Disburser
             </h4>
             <div style={{ fontSize: '0.85rem', color: '#4338ca', marginBottom: '14px' }}>
-              Contract: <strong>AutiqoBasePayroll.sol</strong> (`0x4f82a9c310b882e...7d11`)
+              Contract: <strong>AutiqoBasePayroll.sol</strong> ('0x4f82a9c310b882e...7d11')
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
               <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #c7d2fe' }}>

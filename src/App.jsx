@@ -1,0 +1,466 @@
+import React, { useState } from 'react';
+import { 
+  Menu, 
+  Bell, 
+  Search, 
+  Users, 
+  Banknote, 
+  ShieldCheck, 
+  Wallet, 
+  Plus, 
+  Globe, 
+  Bot
+} from 'lucide-react';
+import NavigationDrawer from './components/NavigationDrawer';
+import PayrollWizard from './components/PayrollWizard';
+import StaffDashboard from './components/StaffDashboard';
+import AuthModal from './components/AuthModal';
+import ProfileModal from './components/ProfileModal';
+
+export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [userRole, setUserRole] = useState("admin"); // 'admin' or 'staff'
+  
+  // Auth & User Profile State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false); // NO automatic popup!
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState({
+    name: 'Guest User',
+    email: '',
+    company: ''
+  });
+
+  // Dynamic user-managed workforce array
+  const [workers, setWorkers] = useState([]);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleLogin = (userPayload) => {
+    setUserRole(userPayload.role);
+    setCurrentUser({
+      name: userPayload.name,
+      email: userPayload.email,
+      company: userPayload.company
+    });
+    setIsAuthenticated(true);
+    setShowAuthModal(false);
+    setActiveTab(userPayload.role === 'admin' ? 'dashboard' : 'staff-overview');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowAuthModal(true);
+  };
+
+  return (
+    <>
+      {/* Deel-Style Intro Splash Screen */}
+      <div className={`splash-container ${!showSplash ? 'slide-out' : ''}`}>
+        <img src="/logo-icon.png" alt="Autiqo Logo" className="splash-logo" />
+        <h1 className="splash-title">Autiqo AI</h1>
+        <p className="splash-subtitle">Autonomous Workforce Finance & Cross-Border Payouts</p>
+      </div>
+
+      {/* Auth Gateway Modal */}
+      {showAuthModal && (
+        <AuthModal 
+          onLogin={handleLogin}
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
+
+      {/* Profile Settings Modal */}
+      {showProfileModal && (
+        <ProfileModal 
+          currentUser={currentUser}
+          userRole={userRole}
+          onClose={() => setShowProfileModal(false)}
+          onUpdateUser={(updated) => setCurrentUser({...currentUser, ...updated})}
+        />
+      )}
+
+      <div className="app-container">
+        {/* Top Header Navigation */}
+        <header className="top-nav">
+          <div className="nav-left">
+            <button className="menu-toggle" onClick={() => setIsDrawerOpen(true)} title="Open Navigation Menu">
+              <Menu size={24} />
+            </button>
+            <div className="brand-logo-container" onClick={() => setActiveTab(userRole === 'admin' ? "dashboard" : "staff-overview")}>
+              <img src="/logo-icon.png" alt="Autiqo Logo" className="brand-logo-img" />
+              <span className="brand-name">Autiqo</span>
+            </div>
+          </div>
+
+          <div className="nav-right">
+            {!isAuthenticated ? (
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => setShowAuthModal(true)}
+                  style={{ padding: '7px 16px', fontSize: '0.85rem' }}
+                >
+                  Sign In
+                </button>
+                <button 
+                  className="btn-primary"
+                  onClick={() => setShowAuthModal(true)}
+                  style={{ padding: '7px 16px', fontSize: '0.85rem' }}
+                >
+                  Create Account
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Interactive Role Switcher */}
+                <div style={{
+                  background: '#f1f5f9',
+                  padding: '3px',
+                  borderRadius: '20px',
+                  display: 'flex',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <button 
+                    onClick={() => {
+                      setUserRole('admin');
+                      setCurrentUser(prev => ({ ...prev, name: 'Ezinne Comfort' }));
+                      setActiveTab('dashboard');
+                    }}
+                    style={{
+                      background: userRole === 'admin' ? '#ffffff' : 'transparent',
+                      color: userRole === 'admin' ? '#0284c7' : '#64748b',
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      border: 'none',
+                      padding: '5px 12px',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      boxShadow: userRole === 'admin' ? 'var(--shadow-sm)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Employer Admin
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setUserRole('staff');
+                      setCurrentUser(prev => ({ ...prev, name: 'Kwame Osei' }));
+                      setActiveTab('staff-overview');
+                    }}
+                    style={{
+                      background: userRole === 'staff' ? '#ffffff' : 'transparent',
+                      color: userRole === 'staff' ? '#0284c7' : '#64748b',
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      border: 'none',
+                      padding: '5px 12px',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      boxShadow: userRole === 'staff' ? 'var(--shadow-sm)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Employee Staff
+                  </button>
+                </div>
+
+                <button 
+                  className="user-profile-btn"
+                  onClick={() => setShowProfileModal(true)}
+                  title="View Account Profile Settings"
+                >
+                  <div className="user-avatar">{currentUser.name ? currentUser.name.split(' ').map(n => n[0]).join('') : 'EC'}</div>
+                  <span className="user-name">{currentUser.name}</span>
+                </button>
+
+                <button 
+                  className="nav-icon-btn" 
+                  onClick={handleLogout}
+                  title="Sign Out / Lock Workspace"
+                >
+                  <Bell size={18} />
+                </button>
+              </>
+            )}
+          </div>
+        </header>
+
+        {/* Sliding Navigation Drawer */}
+        <NavigationDrawer 
+          isOpen={isDrawerOpen} 
+          onClose={() => setIsDrawerOpen(false)}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          workerCount={workers.length}
+          userRole={userRole}
+        />
+
+        {/* Main Content Body */}
+        <main className="main-wrapper">
+          {userRole === 'staff' ? (
+            <StaffDashboard activeTab={activeTab} setActiveTab={setActiveTab} />
+          ) : (
+            <>
+              {/* Deel-style Hero Welcome Banner featuring Seamless African Workforce Showcase */}
+          <div className="hero-card">
+            <div className="hero-text-side">
+              <div className="hero-welcome-badge">
+                <Bot size={16} /> Autonomous Payroll Engine
+              </div>
+              <h1 className="hero-heading" style={{ 
+                fontSize: '2.5rem', 
+                fontWeight: 800, 
+                lineHeight: 1.15,
+                letterSpacing: '-0.03em', 
+                color: '#0f172a',
+                fontFamily: "'Plus Jakarta Sans', sans-serif"
+              }}>
+                Pay your African team in seconds.{' '}
+                <span style={{ 
+                  color: '#38bdf8'
+                }}>
+                  Local rails or Base USDC.
+                </span>
+              </h1>
+              <p className="hero-subtext" style={{ fontSize: '1.05rem', lineHeight: 1.5, color: '#475569', margin: '16px 0 26px 0', fontWeight: 500 }}>
+                Automate salaries, statutory taxes, and cross-border contractor payouts across Nigeria, Ghana, and Kenya with zero payment friction.
+              </p>
+              <div className="hero-actions">
+                <button 
+                  className="btn-primary"
+                  onClick={() => setActiveTab("payroll")}
+                >
+                  <Banknote size={18} /> Execute Payroll Run
+                </button>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => setActiveTab("people")}
+                >
+                  <Users size={18} /> Workforce Queue ({workers.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Seamless blended image stage */}
+            <div className="hero-image-side" style={{ 
+              display: 'flex', 
+              gap: '0', 
+              alignItems: 'flex-end',
+              position: 'relative',
+              paddingRight: '10px'
+            }}>
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'radial-gradient(circle at center bottom, rgba(56, 189, 248, 0.25) 0%, rgba(255, 255, 255, 0) 70%)',
+                pointerEvents: 'none',
+                zIndex: 0
+              }} />
+              <img 
+                src="/african1.png" 
+                alt="African Workforce Team 1" 
+                className="african-hero-img" 
+                style={{ 
+                  height: '240px', 
+                  position: 'relative',
+                  zIndex: 2,
+                  filter: 'drop-shadow(0 14px 20px rgba(2, 132, 199, 0.15))' 
+                }}
+              />
+              <img 
+                src="/african2.png" 
+                alt="African Workforce Team 2" 
+                className="african-hero-img" 
+                style={{ 
+                  height: '220px', 
+                  marginLeft: '-40px',
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: 'drop-shadow(0 10px 15px rgba(2, 132, 199, 0.12))' 
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Seamless Pan-African Workforce Showcase Bar */}
+          <div style={{ 
+            background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)', 
+            border: '1px solid var(--primary-200)', 
+            borderRadius: 'var(--radius-lg)', 
+            padding: '16px 24px', 
+            marginBottom: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: 'var(--shadow-sm)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <div style={{
+                position: 'relative',
+                background: 'radial-gradient(circle, rgba(186, 230, 253, 0.4) 0%, rgba(255,255,255,0) 70%)',
+                padding: '6px 12px',
+                borderRadius: '16px'
+              }}>
+                <img 
+                  src="/african3.png" 
+                  alt="African Workforce Team 3" 
+                  style={{ 
+                    height: '100px', 
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 8px 12px rgba(2, 132, 199, 0.12))'
+                  }}
+                />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
+                  Pan-African Workforce Orchestration Platform
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>
+                  Cross-border workforce payments across Nigerian NIP, Ghana Mobile Money & Base Network.
+                </div>
+              </div>
+            </div>
+            <span className="status-tag verified" style={{ fontSize: '0.85rem', padding: '8px 16px', background: '#e0f2fe', color: '#0369a1' }}>
+              <ShieldCheck size={16} /> Tax & Policy Compliant
+            </span>
+          </div>
+
+          {/* Quick Action Cards */}
+          <div className="quick-actions-grid">
+            <div className="quick-card" onClick={() => setActiveTab("payroll")}>
+              <div className="quick-icon-wrapper">
+                <Banknote size={24} />
+              </div>
+              <div>
+                <div className="quick-card-title">Run Monthly Payroll</div>
+                <div className="quick-card-desc">Execute NGN, GHS & Base USDC payouts.</div>
+              </div>
+            </div>
+
+            <div className="quick-card" onClick={() => setActiveTab("people")}>
+              <div className="quick-icon-wrapper" style={{ background: '#f0f9ff', color: '#0284c7' }}>
+                <Users size={24} />
+              </div>
+              <div>
+                <div className="quick-card-title">Worker Directory</div>
+                <div className="quick-card-desc">Add employees or contractors.</div>
+              </div>
+            </div>
+
+            <div className="quick-card" onClick={() => setActiveTab("base-usdc")}>
+              <div className="quick-icon-wrapper" style={{ background: '#e0e7ff', color: '#4338ca' }}>
+                <Wallet size={24} />
+              </div>
+              <div>
+                <div className="quick-card-title">Base USDC Network Rail</div>
+                <div className="quick-card-desc">Low-cost Web3 settlement rail.</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Dashboard Workspace Grid */}
+          <div className="dashboard-grid">
+            {/* Left Main View */}
+            <div>
+              {activeTab === "dashboard" || activeTab === "payroll" || activeTab === "people" ? (
+                <PayrollWizard workers={workers} setWorkers={setWorkers} />
+              ) : activeTab === "base-usdc" ? (
+                <div className="card" style={{ borderLeft: '4px solid #0052ff' }}>
+                  <div className="card-header">
+                    <h3 className="card-title" style={{ color: '#0052ff' }}>
+                      <Wallet size={22} /> Base Network USDC Web3 Rail
+                    </h3>
+                    <span className="base-rail-badge">Base Network Active</span>
+                  </div>
+                  <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
+                    Autiqo AI settles cross-border contractor salaries on the <strong>Base Network</strong> with near-instant finality and minimal gas costs.
+                  </p>
+                  <div className="balance-display">
+                    <div className="balance-item highlight">
+                      <div className="currency-label">BASE NETWORK STATUS</div>
+                      <div className="balance-amount">Connected</div>
+                    </div>
+                    <div className="balance-item">
+                      <div className="currency-label">NETWORK GAS FEE AVG</div>
+                      <div className="balance-amount">&lt; $0.01</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="card">
+                  <h3 className="card-title">View Selected</h3>
+                  <p style={{ color: '#64748b' }}>Module active.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Right Sidebar */}
+            <div>
+              {/* Treasury Card */}
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="card-title" style={{ fontSize: '1rem' }}>
+                    <Globe size={18} color="#0284c7" /> Multi-Currency Rails
+                  </h3>
+                </div>
+                <div className="balance-display">
+                  <div className="balance-item highlight">
+                    <div className="currency-label">NIGERIA FIAT RAIL</div>
+                    <div className="balance-amount">NIP Instant</div>
+                  </div>
+                  <div className="balance-item">
+                    <div className="currency-label">GHANA FIAT RAIL</div>
+                    <div className="balance-amount">MTN MoMo</div>
+                  </div>
+                  <div className="balance-item">
+                    <div className="currency-label">WEB3 SETTLEMENT</div>
+                    <div className="balance-amount">Base USDC</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compliance & Verification Card */}
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="card-title" style={{ fontSize: '1rem' }}>
+                    <ShieldCheck size={18} color="#166534" /> Statutory Compliance
+                  </h3>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Nigerian PAYE Tax Filing</span>
+                    <span className="status-tag verified">Active</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>PenCom Pension Deduction</span>
+                    <span className="status-tag verified">Active</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Ghana SSNIT Deductions</span>
+                    <span className="status-tag verified">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            </>
+          )}
+        </main>
+
+        <footer className="app-footer">
+          <p>© 2026 Autiqo AI Inc. • Autonomous Workforce Finance & Cross-Border Payout Platform</p>
+        </footer>
+      </div>
+    </>
+  );
+}

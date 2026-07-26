@@ -228,15 +228,15 @@ export default function App() {
                 color: '#0f172a',
                 fontFamily: "'Plus Jakarta Sans', sans-serif"
               }}>
-                Instant African workforce payroll on{' '}
+                Pay your African team in seconds.{' '}
                 <span style={{ 
-                  color: '#38bdf8'
+                  color: '#0052ff'
                 }}>
-                  Base Network USDC.
+                  Zero payment delay.
                 </span>
               </h1>
               <p className="hero-subtext" style={{ fontSize: '1.05rem', lineHeight: 1.5, color: '#475569', margin: '16px 0 24px 0', fontWeight: 500 }}>
-                Automate salaries, statutory tax withholdings, and cross-border contractor payouts using batch disburser smart contracts on Base with &lt; $0.01 gas fees.
+                Automate salaries, statutory tax withholdings, and cross-border contractor payouts automatically on Base.
               </p>
               <div className="hero-actions">
                 <button 
@@ -244,14 +244,14 @@ export default function App() {
                   onClick={() => setActiveTab("payroll")}
                   style={{ background: '#0052ff', borderColor: '#0052ff', boxShadow: '0 4px 14px rgba(0, 82, 255, 0.3)' }}
                 >
-                  <Banknote size={18} /> Execute Base Payroll Run
+                  <Banknote size={18} /> Execute Payroll Run
                 </button>
                 <button 
                   className="btn-secondary"
                   onClick={() => setActiveTab("base-usdc")}
                   style={{ borderColor: '#a5b4fc', color: '#0052ff' }}
                 >
-                  <Wallet size={18} /> Base Network Contract (0x4f82...7d11)
+                  <Wallet size={18} /> View Base Disburser
                 </button>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function App() {
               </div>
               <div>
                 <div className="quick-card-title">Run Monthly Payroll</div>
-                <div className="quick-card-desc">Execute NGN, GHS & Base USDC payouts.</div>
+                <div className="quick-card-desc">Execute batch USDC payouts on Base.</div>
               </div>
             </div>
 

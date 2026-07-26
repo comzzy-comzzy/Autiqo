@@ -9,7 +9,8 @@ import {
   Wallet, 
   Plus, 
   Globe, 
-  Bot
+  Bot,
+  Zap
 } from 'lucide-react';
 import NavigationDrawer from './components/NavigationDrawer';
 import PayrollWizard from './components/PayrollWizard';

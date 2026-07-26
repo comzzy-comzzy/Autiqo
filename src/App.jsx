@@ -236,7 +236,7 @@ export default function App() {
                 </span>
               </h1>
               <p className="hero-subtext" style={{ fontSize: '1.05rem', lineHeight: 1.5, color: '#475569', margin: '16px 0 24px 0', fontWeight: 500 }}>
-                Automate salaries, statutory tax withholdings, and cross-border contractor payouts automatically on Arc Testnet.
+                Automate salaries, statutory tax withholdings, and cross-border contractor payouts automatically via <strong>Arc USDC</strong>.
               </p>
               <div className="hero-actions">
                 <button 
@@ -350,7 +350,7 @@ export default function App() {
               </div>
               <div>
                 <div className="quick-card-title">Run Monthly Payroll</div>
-                <div className="quick-card-desc">Execute batch USDC payouts on Base.</div>
+                <div className="quick-card-desc">Execute batch Arc USDC payouts.</div>
               </div>
             </div>
 

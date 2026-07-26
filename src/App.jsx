@@ -417,21 +417,21 @@ export default function App() {
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title" style={{ fontSize: '1rem' }}>
-                    <Globe size={18} color="#0284c7" /> Multi-Currency Rails
+                    <Globe size={18} color="#0284c7" /> Base Network Web3 Rails
                   </h3>
                 </div>
                 <div className="balance-display">
                   <div className="balance-item highlight">
-                    <div className="currency-label">NIGERIA FIAT RAIL</div>
-                    <div className="balance-amount">NIP Instant</div>
+                    <div className="currency-label">BASE USDC DISBURSER</div>
+                    <div className="balance-amount">Smart Contract</div>
                   </div>
                   <div className="balance-item">
-                    <div className="currency-label">GHANA FIAT RAIL</div>
-                    <div className="balance-amount">MTN MoMo</div>
+                    <div className="currency-label">AVERAGE FINALITY</div>
+                    <div className="balance-amount">~ 2.5 Sec</div>
                   </div>
                   <div className="balance-item">
-                    <div className="currency-label">WEB3 SETTLEMENT</div>
-                    <div className="balance-amount">Base USDC</div>
+                    <div className="currency-label">NETWORK GAS FEE</div>
+                    <div className="balance-amount">&lt; $0.01</div>
                   </div>
                 </div>
               </div>

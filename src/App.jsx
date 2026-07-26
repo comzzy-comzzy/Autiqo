@@ -212,13 +212,13 @@ export default function App() {
             <>
               {/* Base Network Web3 Rebranded Hero Welcome Banner */}
           <div className="hero-card" style={{
-            background: 'linear-gradient(135deg, #f0f5ff 0%, #ffffff 50%, #e0f2fe 100%)',
-            border: '1px solid #c7d2fe',
-            boxShadow: '0 8px 32px -4px rgba(0, 82, 255, 0.12)'
+            background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #e0f2fe 100%)',
+            border: '1px solid #bae6fd',
+            boxShadow: '0 8px 32px -4px rgba(2, 132, 199, 0.12)'
           }}>
             <div className="hero-text-side">
-              <div className="hero-welcome-badge" style={{ background: '#e0e7ff', color: '#0052ff', borderColor: '#a5b4fc' }}>
-                <Zap size={16} color="#0052ff" /> Base Network Web3 Autonomous Payroll Active
+              <div className="hero-welcome-badge" style={{ background: '#e0f2fe', color: '#0284c7', borderColor: '#7dd3fc' }}>
+                <Zap size={16} color="#0284c7" /> Base Network Web3 Autonomous Payroll Active
               </div>
               <h1 className="hero-heading" style={{ 
                 fontSize: '2.55rem', 
@@ -230,7 +230,7 @@ export default function App() {
               }}>
                 Pay your African team in seconds.{' '}
                 <span style={{ 
-                  color: '#0052ff'
+                  color: '#0284c7'
                 }}>
                   Zero payment delay.
                 </span>
@@ -242,14 +242,14 @@ export default function App() {
                 <button 
                   className="btn-primary"
                   onClick={() => setActiveTab("payroll")}
-                  style={{ background: '#0052ff', borderColor: '#0052ff', boxShadow: '0 4px 14px rgba(0, 82, 255, 0.3)' }}
+                  style={{ background: '#0284c7', borderColor: '#0284c7', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
                 >
                   <Banknote size={18} /> Execute Payroll Run
                 </button>
                 <button 
                   className="btn-secondary"
                   onClick={() => setActiveTab("base-usdc")}
-                  style={{ borderColor: '#a5b4fc', color: '#0052ff' }}
+                  style={{ borderColor: '#7dd3fc', color: '#0284c7' }}
                 >
                   <Wallet size={18} /> View Base Disburser
                 </button>
@@ -267,7 +267,7 @@ export default function App() {
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'radial-gradient(circle at center bottom, rgba(0, 82, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%)',
+                background: 'radial-gradient(circle at center bottom, rgba(2, 132, 199, 0.18) 0%, rgba(255, 255, 255, 0) 70%)',
                 pointerEvents: 'none',
                 zIndex: 0
               }} />
@@ -279,7 +279,7 @@ export default function App() {
                   height: '250px', 
                   position: 'relative',
                   zIndex: 2,
-                  filter: 'drop-shadow(0 14px 22px rgba(0, 82, 255, 0.18))' 
+                  filter: 'drop-shadow(0 14px 22px rgba(2, 132, 199, 0.18))' 
                 }}
               />
               <img 
@@ -291,7 +291,7 @@ export default function App() {
                   marginLeft: '-40px',
                   position: 'relative',
                   zIndex: 1,
-                  filter: 'drop-shadow(0 10px 16px rgba(0, 82, 255, 0.14))' 
+                  filter: 'drop-shadow(0 10px 16px rgba(2, 132, 199, 0.14))' 
                 }}
               />
             </div>
@@ -299,8 +299,8 @@ export default function App() {
 
           {/* Base Web3 Rebranded Showcase Bar */}
           <div style={{ 
-            background: 'linear-gradient(135deg, #ffffff 0%, #f0f5ff 100%)', 
-            border: '1px solid #c7d2fe', 
+            background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)', 
+            border: '1px solid #bae6fd', 
             borderRadius: 'var(--radius-lg)', 
             padding: '16px 24px', 
             marginBottom: '28px',
@@ -314,7 +314,7 @@ export default function App() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
               <div style={{
                 position: 'relative',
-                background: 'radial-gradient(circle, rgba(199, 210, 254, 0.5) 0%, rgba(255,255,255,0) 70%)',
+                background: 'radial-gradient(circle, rgba(186, 230, 253, 0.5) 0%, rgba(255,255,255,0) 70%)',
                 padding: '6px 12px',
                 borderRadius: '16px'
               }}>
@@ -324,20 +324,20 @@ export default function App() {
                   style={{ 
                     height: '100px', 
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 8px 14px rgba(0, 82, 255, 0.15))'
+                    filter: 'drop-shadow(0 8px 14px rgba(2, 132, 199, 0.15))'
                   }}
                 />
               </div>
               <div>
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  Base Network Web3 Disburser Active <span style={{ background: '#0052ff', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>Base Mainnet</span>
+                  Base Network Web3 Disburser Active <span style={{ background: '#0284c7', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>Base Mainnet</span>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>
                   Settling African workforce salaries via automated USDC smart contracts with sub-cent gas fees.
                 </div>
               </div>
             </div>
-            <span className="status-tag verified" style={{ fontSize: '0.85rem', padding: '8px 16px', background: '#e0e7ff', color: '#0052ff' }}>
+            <span className="status-tag verified" style={{ fontSize: '0.85rem', padding: '8px 16px', background: '#e0f2fe', color: '#0284c7' }}>
               <ShieldCheck size={16} /> Web3 Smart Contract Verified
             </span>
           </div>

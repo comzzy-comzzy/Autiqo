@@ -1,89 +1,82 @@
-# Autiqo AI 🚀
-### Autonomous Web3 Workforce Payroll & Payout Orchestration Engine on Base Network
+# Autiqo AI
 
-![Autiqo AI Banner](/public/african1.png)
+> **Autonomous Web3 Workforce Payroll & Cross-Border Payout Engine on Base Network**
 
-Autiqo AI is an autonomous, AI agent-driven payroll and cross-border workforce payment orchestration platform built for African businesses and remote teams. It replaces manual spreadsheet calculations with automated statutory tax deductions (PAYE, PenCom, SSNIT), AI anomaly detection, and automated batch USDC disburser smart contracts on the **Base Network**.
-
----
-
-## 🌟 Key Features
-
-- **Base Network Web3 Smart Contract Payouts:** Automated batch USDC salary disburser executed on Base with near-instant finality and < $0.01 gas fees.
-- **Multi-Agent Payroll Orchestration:** Specialized AI validation agents scan payroll batches for anomalies (e.g. salary spikes, duplicate wallets) before execution.
-- **Human Approval-by-Exception:** Policy-driven workflow requiring 1-click founder authorization only when anomalies or policy breaches occur.
-- **Dual Portal Architecture:**
-  - **Employer Admin Portal:** Manage workforce queues, run payroll execution wizards, and review treasury metrics.
-  - **Employee Staff Portal:** View take-home pay, download itemized tax/pension payslips, and configure Base EVM wallet addresses.
-- **Deel-Inspired User Experience:** Sleek sky-blue design system, slide-out navigation drawer, and smooth loading splash animations.
+Autiqo AI is a Web3 payroll orchestration platform built for African businesses, distributed teams, and international contractors. It replaces manual spreadsheet operations with automated statutory tax calculations (PAYE, PenCom, SSNIT), AI anomaly detection, and automated batch USDC disburser smart contracts on the **Base Network**.
 
 ---
 
-## 🛠️ Technology Stack
+## Key Capabilities
 
-- **Frontend Framework:** React 19 + Vite 6
-- **Styling & Icons:** Custom Vanilla CSS Design System + Lucide React
-- **Blockchain & Smart Contracts:** Base Network, Solidity (`AutiqoBasePayroll.sol`), Web3 / Ethers
-- **Process Management:** PM2 Process Manager
+- **Base Network Web3 Smart Contract Payouts:** Batch USDC salary disburser deployed on Base Network with near-instant settlement (~2.5s) and sub-cent gas fees (< $0.01 USD).
+- **Multi-Agent Payroll Orchestration:** Specialized AI validation agents scan payroll batches for anomalies (salary spikes, invalid wallet signatures, duplicate recipients) prior to execution.
+- **Policy-Driven Approval-by-Exception:** Human intervention is required only when an anomaly or policy threshold breach occurs.
+- **Dual Employer & Employee Portals:**
+  - **Employer Admin Portal:** Manage worker queues, execute batch disburser runs, and review multi-currency treasury metrics.
+  - **Employee Staff Portal:** Track net income, download itemized tax/pension payslips, and configure Base EVM wallet destinations.
+- **Deel-Inspired User Architecture:** Sky-blue design system, slide-out navigation drawer, role switcher, and responsive layouts.
 
 ---
 
-## 📁 Repository Structure
+## Technical Architecture
 
 ```
 Autiqo/
-├── public/
+├── public/                  # Assets (Transparent PNGs, Logo Mark)
 ├── src/
 │   ├── components/
-│   │   ├── AuthModal.jsx        # Deel-style Authentication & Registration Gateway
+│   │   ├── AuthModal.jsx        # Deel-style Auth & Registration Gateway
 │   │   ├── NavigationDrawer.jsx # Sliding Navigation Drawer
 │   │   ├── PayrollWizard.jsx    # Base Web3 Smart Contract Payout Engine
 │   │   ├── ProfileModal.jsx     # Account & Base Wallet Settings Modal
 │   │   └── StaffDashboard.jsx   # Employee Income & Payslip Portal
 │   ├── contracts/
 │   │   └── AutiqoBasePayroll.sol # Solidity Smart Contract for Base Network
-│   ├── App.jsx                  # Main Application Component
-│   ├── index.css                # Global Design System & Utility Styles
-│   └── main.jsx                 # React Entry Point
+│   ├── App.jsx                  # Main React Application Container
+│   ├── index.css                # Design Tokens & Layout Styles
+│   └── main.jsx                 # Entry Point
 ├── vite.config.js
 └── package.json
 ```
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## Technology Stack
 
-1. **Clone the repository:**
-   ```bash
-   git clone <YOUR_GITHUB_REPO_URL>
-   cd Autiqo
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the local development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Build for production:**
-   ```bash
-   npm run build
-   ```
+- **Frontend:** React 19, Vite 6
+- **Styling:** Custom Vanilla CSS Design System + Lucide React
+- **Blockchain:** Base Network, Solidity (`AutiqoBasePayroll.sol`), Web3/EVM
+- **Hosting:** Vercel / PM2 Process Manager
 
 ---
 
-## 📄 Smart Contract (`AutiqoBasePayroll.sol`)
+## Smart Contract Overview
 
-The batch payroll smart contract is located at `src/contracts/AutiqoBasePayroll.sol`. It supports:
-- Batch USDC payouts to worker EVM wallets.
-- Event emission for `PayrollBatchExecuted` and `SinglePayoutDispatched`.
+The batch disburser smart contract is located at `src/contracts/AutiqoBasePayroll.sol`. Key functions include:
+- `executeBatchPayroll(bytes32 batchId, PayrollItem[] calldata items)`: Dispatches batch USDC payouts to worker EVM wallets.
+- `PayrollBatchExecuted` & `SinglePayoutDispatched`: Emits on-chain events for full audit traceability.
 
 ---
 
-## 📜 License
+## Quickstart
+
+```bash
+# Clone repository
+git clone https://github.com/comzzy-comzzy/Autiqo.git
+cd Autiqo
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Production build
+npm run build
+```
+
+---
+
+## License
 
 MIT License. Built for Rampamble Hackathon 2026.

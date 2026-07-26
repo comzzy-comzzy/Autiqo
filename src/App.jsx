@@ -218,7 +218,7 @@ export default function App() {
           }}>
             <div className="hero-text-side">
               <div className="hero-welcome-badge" style={{ background: '#e0f2fe', color: '#0284c7', borderColor: '#7dd3fc' }}>
-                <Zap size={16} color="#0284c7" /> Base Network Web3 Autonomous Payroll Active
+                <Zap size={16} color="#0284c7" /> Arc Testnet Web3 Autonomous Payroll Active
               </div>
               <h1 className="hero-heading" style={{ 
                 fontSize: '2.55rem', 
@@ -236,7 +236,7 @@ export default function App() {
                 </span>
               </h1>
               <p className="hero-subtext" style={{ fontSize: '1.05rem', lineHeight: 1.5, color: '#475569', margin: '16px 0 24px 0', fontWeight: 500 }}>
-                Automate salaries, statutory tax withholdings, and cross-border contractor payouts automatically on Base.
+                Automate salaries, statutory tax withholdings, and cross-border contractor payouts automatically on Arc Testnet.
               </p>
               <div className="hero-actions">
                 <button 
@@ -251,7 +251,7 @@ export default function App() {
                   onClick={() => setActiveTab("base-usdc")}
                   style={{ borderColor: '#7dd3fc', color: '#0284c7' }}
                 >
-                  <Wallet size={18} /> View Base Disburser
+                  <Wallet size={18} /> View Arc Disburser
                 </button>
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Base Web3 Rebranded Showcase Bar */}
+          {/* Arc Testnet Web3 Rebranded Showcase Bar */}
           <div style={{ 
             background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)', 
             border: '1px solid #bae6fd', 
@@ -330,15 +330,15 @@ export default function App() {
               </div>
               <div>
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  Base Network Web3 Disburser Active <span style={{ background: '#0284c7', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>Base Mainnet</span>
+                  Arc Testnet Web3 Disburser Active <span style={{ background: '#0284c7', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>Chain ID: 5042002</span>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>
-                  Settling African workforce salaries via automated USDC smart contracts with sub-cent gas fees.
+                  Settling African workforce salaries via automated USDC smart contracts on Arc Testnet.
                 </div>
               </div>
             </div>
             <span className="status-tag verified" style={{ fontSize: '0.85rem', padding: '8px 16px', background: '#e0f2fe', color: '#0284c7' }}>
-              <ShieldCheck size={16} /> Web3 Smart Contract Verified
+              <ShieldCheck size={16} /> Arc Smart Contract Verified
             </span>
           </div>
 
@@ -417,21 +417,21 @@ export default function App() {
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title" style={{ fontSize: '1rem' }}>
-                    <Globe size={18} color="#0284c7" /> Base Network Web3 Rails
+                    <Globe size={18} color="#0284c7" /> Arc Testnet Web3 Rails
                   </h3>
                 </div>
                 <div className="balance-display">
                   <div className="balance-item highlight">
-                    <div className="currency-label">BASE USDC DISBURSER</div>
+                    <div className="currency-label">ARC USDC DISBURSER</div>
                     <div className="balance-amount">Smart Contract</div>
                   </div>
                   <div className="balance-item">
-                    <div className="currency-label">AVERAGE FINALITY</div>
-                    <div className="balance-amount">~ 2.5 Sec</div>
+                    <div className="currency-label">ARC CHAIN ID</div>
+                    <div className="balance-amount">5042002</div>
                   </div>
                   <div className="balance-item">
                     <div className="currency-label">NETWORK GAS FEE</div>
-                    <div className="balance-amount">&lt; $0.01</div>
+                    <div className="balance-amount">0.00 USDC (Testnet)</div>
                   </div>
                 </div>
               </div>

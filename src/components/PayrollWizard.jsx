@@ -5,18 +5,14 @@ import {
   AlertTriangle, 
   ArrowRight, 
   Sparkles, 
-  ShieldCheck, 
   RefreshCw, 
-  Cpu, 
   Check, 
   Send,
-  Zap,
   Plus,
   Trash2,
   Wallet,
   Code,
-  ExternalLink,
-  Copy
+  ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -27,14 +23,14 @@ export default function PayrollWizard({ workers, setWorkers }) {
   const [executionComplete, setExecutionComplete] = useState(false);
   const [txHash, setTxHash] = useState('');
   
-  // New Worker Form State (Web3 Base Focus)
+  // New Worker Form State (Arc Testnet Focus)
   const [showAddForm, setShowAddForm] = useState(false);
   const [newWorker, setNewWorker] = useState({
     name: '',
     role: '',
     location: 'Nigeria',
     grossUsd: '',
-    baseWallet: '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')
+    arcWallet: '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')
   });
 
   const handleAddWorker = (e) => {
@@ -53,10 +49,10 @@ export default function PayrollWizard({ workers, setWorkers }) {
       amountGross: `$ ${grossNum.toLocaleString()} USDC`,
       deductions: `$ ${tax.toLocaleString()} USDC (Tax)`,
       amountNet: `$ ${netPay.toLocaleString()} USDC`,
-      bank: `${newWorker.baseWallet.slice(0,6)}...${newWorker.baseWallet.slice(-4)}`,
-      fullWallet: newWorker.baseWallet,
-      rail: 'Base Network Smart Contract 🔵',
-      status: 'base-usdc'
+      bank: `${newWorker.arcWallet.slice(0,6)}...${newWorker.arcWallet.slice(-4)}`,
+      fullWallet: newWorker.arcWallet,
+      rail: 'Arc Testnet Smart Contract 🟣',
+      status: 'arc-usdc'
     };
 
     setWorkers([created, ...workers]);
@@ -65,7 +61,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
       role: '',
       location: 'Nigeria',
       grossUsd: '',
-      baseWallet: '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')
+      arcWallet: '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')
     });
     setShowAddForm(false);
   };
@@ -85,7 +81,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
 
   const handleExecutePayroll = () => {
     setIsExecuting(true);
-    // Generate realistic Base Network transaction hash
+    // Generate realistic Arc Testnet transaction hash
     const generatedHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
     setTxHash(generatedHash);
 
@@ -108,76 +104,76 @@ export default function PayrollWizard({ workers, setWorkers }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
           <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Wallet size={22} color="#0052ff" /> Base Smart Contract Automated Payroll Engine
+            <Wallet size={22} color="#0284c7" /> Arc Testnet Automated Payroll Engine
           </h2>
           <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-            Automated USDC batch salary disbursement deployed on Base Network ('0x4f82...7d11').
+            Automated USDC batch salary disbursement deployed on Arc Testnet (Chain ID: 5042002).
           </p>
         </div>
         <button 
           className="btn-primary" 
           onClick={() => setShowAddForm(!showAddForm)}
-          style={{ padding: '8px 16px', fontSize: '0.85rem', background: '#0052ff', borderColor: '#0052ff' }}
+          style={{ padding: '8px 16px', fontSize: '0.85rem' }}
         >
-          <Plus size={16} /> Add Base Worker
+          <Plus size={16} /> Add Arc Worker
         </button>
       </div>
 
-      {/* Add Base Worker Form */}
+      {/* Add Arc Worker Form */}
       {showAddForm && (
-        <form onSubmit={handleAddWorker} style={{ background: '#f0f5ff', padding: '20px', borderRadius: '12px', border: '1px solid #c7d2fe', marginBottom: '24px' }}>
-          <h4 style={{ fontWeight: 800, marginBottom: '14px', color: '#3730a3' }}>Add Base USDC Worker Record</h4>
+        <form onSubmit={handleAddWorker} style={{ background: '#f0f9ff', padding: '20px', borderRadius: '12px', border: '1px solid #bae6fd', marginBottom: '24px' }}>
+          <h4 style={{ fontWeight: 800, marginBottom: '14px', color: '#0369a1' }}>Add Arc Testnet USDC Worker Record</h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#4338ca', marginBottom: '4px' }}>Full Name</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>Full Name</label>
               <input 
                 type="text" 
                 required 
                 placeholder="e.g. Adebayo Chukwuma" 
                 value={newWorker.name} 
                 onChange={e => setNewWorker({...newWorker, name: e.target.value})}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.9rem' }}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #7dd3fc', fontSize: '0.9rem' }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#4338ca', marginBottom: '4px' }}>Role / Specialty</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>Role / Specialty</label>
               <input 
                 type="text" 
                 placeholder="e.g. Senior Frontend Engineer" 
                 value={newWorker.role} 
                 onChange={e => setNewWorker({...newWorker, role: e.target.value})}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.9rem' }}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #7dd3fc', fontSize: '0.9rem' }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#4338ca', marginBottom: '4px' }}>Monthly Salary (USDC)</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>Monthly Salary (USDC)</label>
               <input 
                 type="number" 
                 required 
                 placeholder="e.g. 2500" 
                 value={newWorker.grossUsd} 
                 onChange={e => setNewWorker({...newWorker, grossUsd: e.target.value})}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.9rem' }}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #7dd3fc', fontSize: '0.9rem' }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#4338ca', marginBottom: '4px' }}>Base EVM Wallet Address</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>Arc EVM Wallet Address</label>
               <input 
                 type="text" 
                 required
-                value={newWorker.baseWallet} 
-                onChange={e => setNewWorker({...newWorker, baseWallet: e.target.value})}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.8rem', fontFamily: 'monospace' }}
+                value={newWorker.arcWallet} 
+                onChange={e => setNewWorker({...newWorker, arcWallet: e.target.value})}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #7dd3fc', fontSize: '0.8rem', fontFamily: 'monospace' }}
               />
             </div>
           </div>
 
           <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
             <button type="button" className="btn-secondary" onClick={() => setShowAddForm(false)} style={{ padding: '6px 14px', fontSize: '0.85rem' }}>Cancel</button>
-            <button type="submit" className="btn-primary" style={{ padding: '6px 16px', fontSize: '0.85rem', background: '#0052ff', borderColor: '#0052ff' }}>
+            <button type="submit" className="btn-primary" style={{ padding: '6px 16px', fontSize: '0.85rem' }}>
               Save Worker
             </button>
           </div>
@@ -188,7 +184,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
       <div className="wizard-steps">
         <div className={`step-item ${currentStep >= 1 ? 'active' : ''}`}>
           <div className="step-number">1</div>
-          <span>1. Validate Base Wallets</span>
+          <span>1. Validate Arc Wallets</span>
         </div>
         <div className={`step-item ${currentStep >= 2 ? 'active' : ''}`}>
           <div className="step-number">2</div>
@@ -207,28 +203,28 @@ export default function PayrollWizard({ workers, setWorkers }) {
       {/* Step 1: Scan & Collect */}
       {currentStep === 1 && (
         <div style={{ padding: '24px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', marginBottom: '20px' }}>
-          <Bot size={40} color="#0052ff" style={{ marginBottom: '12px' }} />
+          <Bot size={40} color="#0284c7" style={{ marginBottom: '12px' }} />
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
-            Autiqo AI Agent Base Wallet Audit
+            Autiqo AI Agent Arc Wallet Audit
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#64748b', maxWidth: '520px', margin: '0 auto 20px auto' }}>
             {workers.length > 0 
-              ? `Ready to validate ${workers.length} worker Base network wallet addresses and calculate USDC batch disburser payload.`
-              : `No worker records added yet. Click "Add Base Worker" above to enter worker wallet details.`}
+              ? `Ready to validate ${workers.length} worker Arc Testnet wallet addresses and calculate USDC batch disburser payload.`
+              : `No worker records added yet. Click "Add Arc Worker" above to enter worker wallet details.`}
           </p>
           <button 
             className="btn-primary" 
             onClick={handleStartAnalysis}
             disabled={isAnalyzing || workers.length === 0}
-            style={{ opacity: workers.length === 0 ? 0.5 : 1, background: '#0052ff', borderColor: '#0052ff' }}
+            style={{ opacity: workers.length === 0 ? 0.5 : 1 }}
           >
             {isAnalyzing ? (
               <>
-                <RefreshCw size={18} className="animate-spin" /> Verifying EVM Wallet Signatures...
+                <RefreshCw size={18} className="animate-spin" /> Verifying Arc EVM Signatures...
               </>
             ) : (
               <>
-                <Sparkles size={18} /> Audit & Validate Base Payload
+                <Sparkles size={18} /> Audit & Validate Arc Payload
               </>
             )}
           </button>
@@ -256,7 +252,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
             </div>
           ) : (
             <div style={{ padding: '16px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '12px', color: '#166534', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <CheckCircle size={20} /> All worker wallet signatures verified for Base smart contract deployment.
+              <CheckCircle size={20} /> All worker wallet signatures verified for Arc Testnet smart contract deployment.
             </div>
           )}
 
@@ -264,7 +260,6 @@ export default function PayrollWizard({ workers, setWorkers }) {
             <button 
               className="btn-primary" 
               onClick={() => setCurrentStep(3)}
-              style={{ background: '#0052ff', borderColor: '#0052ff' }}
             >
               Proceed to Contract Batching <ArrowRight size={18} />
             </button>
@@ -272,31 +267,31 @@ export default function PayrollWizard({ workers, setWorkers }) {
         </div>
       )}
 
-      {/* Step 3: Base Network Smart Contract Execution */}
+      {/* Step 3: Arc Testnet Smart Contract Execution */}
       {currentStep === 3 && (
         <div>
-          <div style={{ background: '#f0f5ff', padding: '20px', borderRadius: '12px', border: '1px solid #a5b4fc', marginBottom: '20px' }}>
-            <h4 style={{ fontWeight: 800, color: '#3730a3', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Code size={18} color="#0052ff" /> Base Network Automated Smart Contract Disburser
+          <div style={{ background: '#f0f9ff', padding: '20px', borderRadius: '12px', border: '1px solid #bae6fd', marginBottom: '20px' }}>
+            <h4 style={{ fontWeight: 800, color: '#0369a1', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Code size={18} color="#0284c7" /> Arc Testnet Automated Smart Contract Disburser
             </h4>
-            <div style={{ fontSize: '0.85rem', color: '#4338ca', marginBottom: '14px' }}>
-              Contract: <strong>AutiqoBasePayroll.sol</strong> ('0x4f82a9c310b882e...7d11')
+            <div style={{ fontSize: '0.85rem', color: '#0369a1', marginBottom: '14px' }}>
+              Contract: <strong>AutiqoArcPayroll.sol</strong> ('0x3600000000000000000000000000000000000000')
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-              <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #c7d2fe' }}>
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>PAYOUT ASSET</span>
+              <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>PAYOUT & NATIVE GAS</span>
                 <div style={{ fontWeight: 800, color: '#0f172a' }}>USDC Stablecoin</div>
-                <div style={{ fontSize: '0.8rem', color: '#0052ff', fontWeight: 700 }}>Base Mainnet Native</div>
+                <div style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 700 }}>Arc Testnet Native Token</div>
               </div>
-              <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #c7d2fe' }}>
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>AVERAGE GAS FEE</span>
-                <div style={{ fontWeight: 800, color: '#166534' }}>&lt; $0.008 USD</div>
-                <div style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 700 }}>99.2% Fee Reduction</div>
+              <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>TESTNET CHAIN ID</span>
+                <div style={{ fontWeight: 800, color: '#166534' }}>5042002</div>
+                <div style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 700 }}>Zero Mainnet Cost</div>
               </div>
-              <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #c7d2fe' }}>
+              <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
                 <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>SETTLEMENT SPEED</span>
-                <div style={{ fontWeight: 800, color: '#0f172a' }}>~ 2.5 Seconds</div>
-                <div style={{ fontSize: '0.8rem', color: '#0052ff', fontWeight: 700 }}>Instant Finality</div>
+                <div style={{ fontWeight: 800, color: '#0f172a' }}>~ 1.8 Seconds</div>
+                <div style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 700 }}>Instant Finality</div>
               </div>
             </div>
           </div>
@@ -306,15 +301,15 @@ export default function PayrollWizard({ workers, setWorkers }) {
               className="btn-primary" 
               onClick={handleExecutePayroll}
               disabled={isExecuting}
-              style={{ padding: '12px 28px', fontSize: '1rem', background: '#0052ff', borderColor: '#0052ff' }}
+              style={{ padding: '12px 28px', fontSize: '1rem' }}
             >
               {isExecuting ? (
                 <>
-                  <RefreshCw size={20} className="animate-spin" /> Broadcasting Contract Transaction...
+                  <RefreshCw size={20} className="animate-spin" /> Broadcasting Arc Testnet Transaction...
                 </>
               ) : (
                 <>
-                  <Send size={20} /> Execute Automated Base Smart Contract Payout
+                  <Send size={20} /> Execute Automated Arc Testnet Smart Contract Payout
                 </>
               )}
             </button>
@@ -329,23 +324,15 @@ export default function PayrollWizard({ workers, setWorkers }) {
             <Check size={32} />
           </div>
           <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>
-            Base Smart Contract Dispatched!
+            Arc Testnet Smart Contract Dispatched!
           </h3>
           <p style={{ color: '#64748b', fontSize: '0.9rem', maxWidth: '520px', margin: '0 auto 16px auto' }}>
-            USDC batch disburser successfully executed on Base Network. All workers received funds directly into their Web3 wallets.
+            USDC batch disburser successfully executed on Arc Testnet. All workers received funds directly into their Web3 wallets with zero gas cost.
           </p>
 
           <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 700 }}>Base Tx Hash:</span>
-            <code style={{ fontSize: '0.8rem', color: '#0052ff', fontWeight: 700 }}>{txHash ? `${txHash.slice(0, 10)}...${txHash.slice(-8)}` : '0x4f82...7d11'}</code>
-            <a 
-              href={`https://basescan.org/tx/${txHash || '0x4f82a9c310b882e7d11'}`} 
-              target="_blank" 
-              rel="noreferrer"
-              style={{ color: '#0052ff', textDecoration: 'none', display: 'flex', alignItems: 'center' }}
-            >
-              <ExternalLink size={14} />
-            </a>
+            <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 700 }}>Arc Tx Hash:</span>
+            <code style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 700 }}>{txHash ? `${txHash.slice(0, 10)}...${txHash.slice(-8)}` : '0x3600...0000'}</code>
           </div>
 
           <div>
@@ -362,13 +349,13 @@ export default function PayrollWizard({ workers, setWorkers }) {
       {/* Worker List Table */}
       <div style={{ marginTop: '28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <h4 style={{ fontWeight: 800, color: '#0f172a' }}>Base USDC Worker Payout Queue</h4>
+          <h4 style={{ fontWeight: 800, color: '#0f172a' }}>Arc Testnet USDC Worker Payout Queue</h4>
           <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Total: {workers.length}</span>
         </div>
 
         {workers.length === 0 ? (
           <div style={{ padding: '30px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#64748b' }}>
-            No worker records in queue. Click <strong>"Add Base Worker"</strong> above to enter worker EVM wallet addresses.
+            No worker records in queue. Click <strong>"Add Arc Worker"</strong> above to enter worker EVM wallet addresses.
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -380,7 +367,7 @@ export default function PayrollWizard({ workers, setWorkers }) {
                   <th>Gross Pay (USDC)</th>
                   <th>Deductions</th>
                   <th>Net Payout</th>
-                  <th>Base EVM Wallet</th>
+                  <th>Arc EVM Wallet</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -397,9 +384,9 @@ export default function PayrollWizard({ workers, setWorkers }) {
                     </td>
                     <td style={{ fontWeight: 600 }}>{w.amountGross}</td>
                     <td style={{ fontSize: '0.8rem', color: '#dc2626' }}>{w.deductions}</td>
-                    <td style={{ fontWeight: 800, color: '#0052ff' }}>{w.amountNet}</td>
+                    <td style={{ fontWeight: 800, color: '#0284c7' }}>{w.amountNet}</td>
                     <td>
-                      <code style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0052ff', background: '#f0f5ff', padding: '2px 8px', borderRadius: '6px' }}>
+                      <code style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0284c7', background: '#f0f9ff', padding: '2px 8px', borderRadius: '6px' }}>
                         {w.bank}
                       </code>
                     </td>

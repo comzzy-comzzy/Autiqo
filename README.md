@@ -1,19 +1,19 @@
 # Autiqo AI
 
-> **Autonomous Web3 Workforce Payroll & Payout Orchestration Engine on Base Network**
+> **Autonomous Web3 Workforce Payroll & Payout Orchestration Engine on Arc Testnet**
 
-Autiqo AI is a Web3 payroll orchestration platform built for African businesses, distributed teams, and international contractors. It replaces manual spreadsheet operations with automated statutory tax calculations (PAYE, PenCom, SSNIT), AI anomaly detection, and automated batch USDC disburser smart contracts on the **Base Network**.
+Autiqo AI is a Web3 payroll orchestration platform built for African businesses, distributed teams, and international contractors. It replaces manual spreadsheet operations with automated statutory tax calculations (PAYE, PenCom, SSNIT), AI anomaly detection, and automated batch USDC disburser smart contracts on **Arc Testnet (Circle Layer 1, Chain ID: 5042002)**.
 
 ---
 
 ## Key Capabilities
 
-- **Base Network Web3 Smart Contract Payouts:** 100% Web3 crypto settlement rail using batch USDC salary disburser smart contracts deployed on Base Network (~2.5s settlement, < $0.01 USD gas fees).
+- **Arc Testnet Web3 Smart Contract Payouts:** 100% Web3 crypto settlement rail using batch USDC salary disburser smart contracts deployed on Arc Testnet (~1.8s settlement, native USDC gas token).
 - **Multi-Agent Payroll Orchestration:** Specialized AI validation agents scan payroll batches for anomalies (salary spikes, invalid wallet signatures, duplicate recipients) prior to on-chain execution.
 - **Policy-Driven Approval-by-Exception:** Human intervention is required only when an anomaly or policy threshold breach occurs.
 - **Dual Employer & Employee Portals:**
-  - **Employer Admin Portal:** Manage worker EVM wallet queues, execute batch disburser smart contract runs, and review Base USDC treasury metrics.
-  - **Employee Staff Portal:** Track net income, download itemized tax/pension payslips, and configure Base EVM wallet destinations.
+  - **Employer Admin Portal:** Manage worker EVM wallet queues, execute batch disburser smart contract runs, and review Arc USDC treasury metrics.
+  - **Employee Staff Portal:** Track net income, download itemized tax/pension payslips, and configure Arc EVM wallet destinations.
 - **Deel-Inspired User Architecture:** Sky-blue design system, slide-out navigation drawer, role switcher, and responsive layouts.
 
 ---

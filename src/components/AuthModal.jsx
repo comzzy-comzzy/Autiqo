@@ -205,6 +205,7 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
       wallet: primaryWallet,
       usdcBalance: balance
     });
+    onClose();
   }
 
   async function handleSendOtp(event) {

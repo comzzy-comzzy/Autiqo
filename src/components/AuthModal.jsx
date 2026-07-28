@@ -260,11 +260,9 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
 
         <div className="auth-brand">
           <img src="/logo-icon.png" alt="Autiqo Logo" />
-          <h2>{adminOnly ? 'Admin sign in' : 'Sign in to your staff dashboard'}</h2>
-          <p>Email recovers the same user-controlled Circle wallet. Salary withdrawals use this same login.</p>
+          <h2>{adminOnly ? 'Admin Sign In / Sign Up' : 'Staff Sign In / Sign Up'}</h2>
+          <p>Sign in or sign up with your email to access your dashboard and Arc Web3 wallet.</p>
         </div>
-
-        {!adminOnly && <div className="auth-alert info"><UserCheck size={16} /> Existing staff sign in with the email already linked to their account.</div>}
 
         {errorMessage && (
           <div className="auth-alert error">
@@ -278,34 +276,8 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
         </div>
 
         <form onSubmit={handleSendOtp} className="auth-wallet-form">
-          {!adminOnly && (
-            <>
-              <label>
-                Full legal name
-                <input value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Your full name" />
-              </label>
-              {accountType === 'client' && (
-                <label>
-                  Company name
-                  <input value={companyName} onChange={(event) => setCompanyName(event.target.value)} placeholder="Autiqo Technologies Ltd" />
-                </label>
-              )}
-              <label>
-                Country
-                <select value={country} onChange={(event) => setCountry(event.target.value)}>
-                  <option value="Nigeria">Nigeria</option>
-                  <option value="Ghana">Ghana</option>
-                  <option value="Kenya">Kenya</option>
-                  <option value="South Africa">South Africa</option>
-                  <option value="Rwanda">Rwanda</option>
-                  <option value="Egypt">Egypt</option>
-                </select>
-              </label>
-            </>
-          )}
-
           <label>
-            Email for wallet login
+            Email Address
             <span>
               <Mail size={17} />
               <input
@@ -313,14 +285,14 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder={accountType === 'client' ? 'admin@company.com' : 'worker@company.com'}
+                placeholder="your.email@company.com"
               />
             </span>
           </label>
 
           <div className="auth-action-grid single">
             <button type="submit" className="btn-primary" disabled={isBusy}>
-              <Mail size={17} /> {isBusy ? 'Opening Verification...' : 'Send Email Code'}
+              <Mail size={17} /> {isBusy ? 'Opening Verification...' : 'Send Verification Code'}
             </button>
           </div>
         </form>

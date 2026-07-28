@@ -297,19 +297,6 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
             </button>
           </div>
         </form>
-
-        {wallet && (
-          <div className="auth-wallet-summary">
-            <div>
-              <span>Arc wallet</span>
-              <strong>{wallet.address}</strong>
-            </div>
-            <div>
-              <span>Network</span>
-              <strong>{wallet.blockchain || 'ARC-TESTNET'}</strong>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

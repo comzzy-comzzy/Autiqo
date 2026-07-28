@@ -224,7 +224,8 @@ export default function App() {
           <div className="nav-right">
             {!isAuthenticated ? (
               <div className="public-nav-actions">
-                <button className="btn-secondary nav-cta" onClick={openAuth}>
+                <button className="btn-primary nav-cta" onClick={openAuth} style={{ background: '#0284c7', borderColor: '#0284c7', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}>
+                  <img src="/logo-icon.png" alt="Autiqo Logo" style={{ width: '18px', height: '18px', objectFit: 'contain' }} />
                   Sign In / Sign Up
                 </button>
               </div>

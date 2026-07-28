@@ -29,7 +29,7 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
       title: "Financial Orchestration",
       items: [
         { id: "payouts", label: "Cross-Border Payouts", icon: Globe },
-        { id: "base-usdc", label: "Base USDC Rail", icon: Wallet, badge: "Base Network" },
+        { id: "arc-usdc", label: "Arc USDC Rail", icon: Wallet, badge: "Arc" },
         { id: "compliance", label: "Compliance & Audit", icon: ShieldCheck },
       ]
     },
@@ -37,26 +37,17 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
       title: "Intelligence",
       items: [
         { id: "agent", label: "Autiqo AI Co-Pilot", icon: Bot },
-        { id: "knowledge", label: "Knowledge Base", icon: HelpCircle },
+        { id: "knowledge", label: "Help Center", icon: HelpCircle },
       ]
     }
   ];
 
   const staffSections = [
     {
-      title: "Employee Portal",
+      title: "Staff Workspace",
       items: [
-        { id: "staff-overview", label: "My Pay & Income", icon: CreditCard },
-        { id: "staff-payslips", label: "Itemized Payslips", icon: FileText, badge: "3 Receipts" },
-        { id: "staff-payout-details", label: "Payout Destination", icon: Wallet },
-        { id: "staff-profile", label: "Personal Profile", icon: UserCheck },
-      ]
-    },
-    {
-      title: "Support & Policy",
-      items: [
-        { id: "knowledge", label: "Tax & Pension Rules", icon: ShieldCheck },
-        { id: "agent", label: "Autiqo Assistant", icon: Bot },
+        { id: "staff-profile", label: "My Profile & Task", icon: UserCheck },
+        { id: "staff-payout-details", label: "Wallet Address", icon: Wallet },
       ]
     }
   ];
@@ -116,10 +107,10 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
           {userRole === 'staff' && (
             <div style={{ marginTop: '24px', padding: '16px', background: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>
-                Base USDC Wallet Active
+                Arc USDC Wallet Active
               </div>
               <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '12px' }}>
-                Receive instant low-cost payouts directly to your Base Web3 address.
+                Receive and withdraw salary through the Arc wallet tied to your email login.
               </div>
               <button 
                 className="btn-primary" 

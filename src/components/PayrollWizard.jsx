@@ -16,12 +16,13 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function PayrollWizard({ workers, setWorkers }) {
+export default function PayrollWizard({ workers, setWorkers, ledger = [], setLedger }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionComplete, setExecutionComplete] = useState(false);
   const [txHash, setTxHash] = useState('');
+  const [autoPayroll, setAutoPayroll] = useState(true);
   
   // New Worker Form State (Arc Testnet Focus)
   const [showAddForm, setShowAddForm] = useState(false);
@@ -89,6 +90,19 @@ export default function PayrollWizard({ workers, setWorkers }) {
       setIsExecuting(false);
       setExecutionComplete(true);
       setCurrentStep(4);
+      if (setLedger) {
+        const entries = workers.map((worker, index) => ({
+          id: `TX-${Date.now()}-${index + 1}`,
+          type: 'Salary payout',
+          actor: worker.name,
+          amount: worker.amountNet.replace('$ ', ''),
+          status: 'Completed',
+          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          rail: 'Arc Testnet',
+          txHash: generatedHash
+        }));
+        setLedger([...entries, ...ledger]);
+      }
       confetti({
         particleCount: 100,
         spread: 70,
@@ -116,6 +130,39 @@ export default function PayrollWizard({ workers, setWorkers }) {
           style={{ padding: '8px 16px', fontSize: '0.85rem' }}
         >
           <Plus size={16} /> Add Arc Worker
+        </button>
+      </div>
+
+      <div className="bookkeeping-grid">
+        <div className="bookkeeping-card">
+          <span>Arc treasury balance</span>
+          <strong>24,800.00 USDC</strong>
+          <small>Available for this payroll cycle</small>
+        </div>
+        <div className="bookkeeping-card">
+          <span>Queued net payroll</span>
+          <strong>
+            {workers.reduce((sum, worker) => {
+              const value = Number(String(worker.amountNet).replace(/[^0-9.]/g, '')) || 0;
+              return sum + value;
+            }, 0).toLocaleString()} USDC
+          </strong>
+          <small>{workers.length} staff records ready</small>
+        </div>
+        <div className="bookkeeping-card">
+          <span>Automation</span>
+          <strong>{autoPayroll ? 'Enabled' : 'Manual review'}</strong>
+          <small>{autoPayroll ? 'Runs after approval checks pass' : 'Admin must execute each run'}</small>
+        </div>
+      </div>
+
+      <div className="automation-row">
+        <label>
+          <input type="checkbox" checked={autoPayroll} onChange={(event) => setAutoPayroll(event.target.checked)} />
+          Auto-send payroll after wallet validation and anomaly checks
+        </label>
+        <button className="btn-secondary" onClick={() => alert('Bookkeeping export prepared for accounting review.')}>
+          Export Bookkeeping
         </button>
       </div>
 
@@ -399,6 +446,45 @@ export default function PayrollWizard({ workers, setWorkers }) {
                         <Trash2 size={16} />
                       </button>
                     </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="card ledger-card">
+        <div className="card-header">
+          <h3 className="card-title" style={{ fontSize: '1rem' }}>
+            <Wallet size={18} color="#0284c7" /> Payroll Bookkeeping Ledger
+          </h3>
+          <span className="status-tag verified">{ledger.length} entries</span>
+        </div>
+        {ledger.length === 0 ? (
+          <p className="muted-copy">No Arc payment records yet.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Record</th>
+                  <th>Type</th>
+                  <th>Staff / Account</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ledger.slice(0, 8).map((entry) => (
+                  <tr key={entry.id}>
+                    <td style={{ fontWeight: 700 }}>{entry.id}</td>
+                    <td>{entry.type}</td>
+                    <td>{entry.actor}</td>
+                    <td style={{ fontWeight: 800, color: '#0284c7' }}>{entry.amount}</td>
+                    <td><span className="status-tag verified">{entry.status}</span></td>
+                    <td>{entry.date}</td>
                   </tr>
                 ))}
               </tbody>

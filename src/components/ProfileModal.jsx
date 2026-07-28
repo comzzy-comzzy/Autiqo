@@ -14,13 +14,13 @@ import {
 } from 'lucide-react';
 
 export default function ProfileModal({ currentUser, userRole, onClose, onUpdateUser }) {
-  const [name, setName] = useState(currentUser.name || 'Ezinne Comfort');
-  const [email, setEmail] = useState(currentUser.email || 'ezinne@autiqo.com');
-  const [company, setCompany] = useState(currentUser.company || 'Autiqo Global Corp');
+  const [name, setName] = useState(currentUser.name || '');
+  const [email, setEmail] = useState(currentUser.email || '');
+  const [company, setCompany] = useState(currentUser.company || '');
   const [tin, setTin] = useState('24910482-001');
   const [pensionPin, setPensionPin] = useState('PEN1092840192');
-  const [baseWallet, setBaseWallet] = useState('0x89A2...c4F2');
-  const [bankAccount, setBankAccount] = useState('GTBank 0123984712');
+  const [arcWallet, setArcWallet] = useState(currentUser.wallet?.address || '');
+  const [bankAccount, setBankAccount] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleSave = (e) => {
@@ -150,14 +150,14 @@ export default function ProfileModal({ currentUser, userRole, onClose, onUpdateU
           ) : (
             <div style={{ background: '#f0f5ff', padding: '16px', borderRadius: '12px', border: '1px solid #c7d2fe', marginBottom: '20px' }}>
               <h4 style={{ fontWeight: 800, fontSize: '0.9rem', color: '#3730a3', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Wallet size={16} color="#4338ca" /> Base USDC Web3 Wallet Setup
+                <Wallet size={16} color="#4338ca" /> Arc USDC Wallet Setup
               </h4>
               <div style={{ marginBottom: '10px' }}>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#4338ca', fontWeight: 700 }}>Base Address (EVM Compatible)</label>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#4338ca', fontWeight: 700 }}>Arc Wallet Address (EVM Compatible)</label>
                 <input 
                   type="text" 
-                  value={baseWallet} 
-                  onChange={e => setBaseWallet(e.target.value)}
+                  value={arcWallet}
+                  onChange={e => setArcWallet(e.target.value)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.85rem', fontFamily: 'monospace' }}
                 />
               </div>

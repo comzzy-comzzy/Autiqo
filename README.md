@@ -14,6 +14,12 @@ Autiqo AI is a Web3 payroll orchestration platform built for African businesses,
 - **Dual Employer & Employee Portals:**
   - **Employer Admin Portal:** Manage worker EVM wallet queues, execute batch disburser smart contract runs, and review Arc USDC treasury metrics.
   - **Employee Staff Portal:** Track net income, download itemized tax/pension payslips, and configure Arc EVM wallet destinations.
+
+## Portal Access
+
+- Staff sign in from `/` using their existing email or a new staff email.
+- Admins sign in from `/admin`.
+- Set `ADMIN_EMAILS` to a comma-separated list of approved administrator emails before deploying.
 - **Deel-Inspired User Architecture:** Sky-blue design system, slide-out navigation drawer, role switcher, and responsive layouts.
 
 ---
@@ -25,13 +31,13 @@ Autiqo/
 ├── public/                  # Assets (Transparent PNGs, Logo Mark)
 ├── src/
 │   ├── components/
-│   │   ├── AuthModal.jsx        # Deel-style Auth & Registration Gateway
+│   │   ├── AuthModal.jsx        # Circle email OTP and Arc wallet auth
 │   │   ├── NavigationDrawer.jsx # Sliding Navigation Drawer
-│   │   ├── PayrollWizard.jsx    # Base Web3 Smart Contract Payout Engine
-│   │   ├── ProfileModal.jsx     # Account & Base Wallet Settings Modal
+│   │   ├── PayrollWizard.jsx    # Arc Web3 Smart Contract Payout Engine
+│   │   ├── ProfileModal.jsx     # Account & Arc Wallet Settings Modal
 │   │   └── StaffDashboard.jsx   # Employee Income & Payslip Portal
 │   ├── contracts/
-│   │   └── AutiqoBasePayroll.sol # Solidity Smart Contract for Base Network
+│   │   └── AutiqoArcPayroll.sol # Solidity Smart Contract for Arc Testnet
 │   ├── App.jsx                  # Main React Application Container
 │   ├── index.css                # Design Tokens & Layout Styles
 │   └── main.jsx                 # Entry Point
@@ -45,14 +51,14 @@ Autiqo/
 
 - **Frontend:** React 19, Vite 6
 - **Styling:** Custom Vanilla CSS Design System + Lucide React
-- **Blockchain:** Base Network, Solidity (`AutiqoBasePayroll.sol`), Web3/EVM
+- **Blockchain:** Arc Testnet, Circle user-controlled wallets, Solidity (`AutiqoArcPayroll.sol`), Web3/EVM
 - **Hosting:** Vercel / PM2 Process Manager
 
 ---
 
 ## Smart Contract Overview
 
-The batch disburser smart contract is located at `src/contracts/AutiqoBasePayroll.sol`. Key functions include:
+The batch disburser smart contract is located at `src/contracts/AutiqoArcPayroll.sol`. Key functions include:
 - `executeBatchPayroll(bytes32 batchId, PayrollItem[] calldata items)`: Dispatches batch USDC payouts to worker EVM wallets.
 - `PayrollBatchExecuted` & `SinglePayoutDispatched`: Emits on-chain events for full audit traceability.
 

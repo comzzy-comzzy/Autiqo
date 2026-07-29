@@ -9,7 +9,6 @@ import {
   X, 
   Wallet, 
   Globe, 
-  ArrowUpRight,
   FileCheck2,
   LayoutDashboard,
   UserCheck,
@@ -107,15 +106,6 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
             </div>
           ))}
 
-          {userRole === 'staff' && (
-            <div className="drawer-staff-note">
-              <strong>Need to submit work?</strong>
-              <p>Proof of work has its own page, separate from your personal details.</p>
-              <button onClick={() => { setActiveTab('staff-work-proof'); onClose(); }}>
-                Open proof of work <ArrowUpRight size={14} />
-              </button>
-            </div>
-          )}
         </div>
         {userRole === 'staff' && (
           <div className="drawer-footer">

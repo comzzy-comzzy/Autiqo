@@ -3346,38 +3346,6 @@ body {
   font-size: .72rem;
 }
 
-.drawer-staff-note {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  margin-top: 24px;
-  padding: 16px;
-}
-
-.drawer-staff-note strong {
-  color: #334155;
-  font-size: .82rem;
-}
-
-.drawer-staff-note p {
-  color: #64748b;
-  font-size: .74rem;
-  margin: 5px 0 12px;
-}
-
-.drawer-staff-note button {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  color: #0277b5;
-  cursor: pointer;
-  display: flex;
-  font-size: .74rem;
-  font-weight: 750;
-  gap: 5px;
-  padding: 0;
-}
-
 .staff-record-row {
   align-items: center;
   border-bottom: 1px solid #e2e8f0;

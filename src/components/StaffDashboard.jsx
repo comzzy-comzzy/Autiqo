@@ -1,16 +1,21 @@
 import React, { useMemo, useState } from 'react';
 import {
+  ArrowDownToLine,
   ArrowRight,
+  ArrowUpFromLine,
   BriefcaseBusiness,
   Check,
+  CircleDollarSign,
   ClipboardList,
   Copy,
   FileCheck2,
   FileText,
   Inbox,
+  ShieldCheck,
   Upload,
   UserRound,
-  Wallet
+  Wallet,
+  X
 } from 'lucide-react';
 
 const MAX_PROOF_SIZE = 2 * 1024 * 1024;
@@ -48,6 +53,7 @@ export default function StaffDashboard({
   const [currentTask, setCurrentTask] = useState(profile.currentTask || '');
   const [profileSaved, setProfileSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [walletAction, setWalletAction] = useState(null);
 
   const [proofPeriod, setProofPeriod] = useState('');
   const [proofNote, setProofNote] = useState('');
@@ -312,29 +318,68 @@ export default function StaffDashboard({
           <p>Use this address to receive Arc USDC. The balance shown comes from your connected Circle wallet.</p>
         </header>
 
-        <div className="staff-wallet-card">
-          <div className="staff-wallet-heading">
-            <div>
-              <span>Available balance</span>
-              <strong>{balanceAvailable ? `${currentUser.usdcBalance} USDC` : 'Unavailable'}</strong>
+        <div className="staff-wallet-shell">
+          <section className="staff-wallet-balance-card">
+            <div className="staff-wallet-topline">
+              <span className="staff-wallet-mark"><Wallet size={19} /></span>
+              <span>Arc USDC wallet</span>
+              <span className={`staff-wallet-connection ${walletReady ? 'is-ready' : ''}`}>
+                <i /> {walletReady ? 'Connected' : 'Not connected'}
+              </span>
             </div>
-            <span className={`staff-status ${walletReady ? 'is-ready' : ''}`}>
-              {walletReady ? 'Connected' : 'Not connected'}
-            </span>
-          </div>
-          <div className="staff-address-block">
-            <span>Arc wallet address</span>
-            <code>{walletReady ? walletAddress : 'No wallet address is available for this account.'}</code>
-            {walletReady && (
-              <button type="button" onClick={copyWallet}>
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-                {copied ? 'Copied' : 'Copy address'}
+
+            <div className="staff-wallet-balance">
+              <span>Available balance</span>
+              <strong>
+                {balanceAvailable ? currentUser.usdcBalance : '—'}
+                <small>USDC</small>
+              </strong>
+            </div>
+
+            <div className="staff-wallet-actions">
+              <button type="button" onClick={() => setWalletAction('deposit')}>
+                <ArrowDownToLine size={18} />
+                <span>
+                  <strong>Deposit</strong>
+                  <small>Receive USDC</small>
+                </span>
               </button>
-            )}
-          </div>
-          <p className="staff-wallet-note">
-            Only send assets supported by your connected Arc wallet. Withdrawal is not shown until a real transaction flow is connected.
-          </p>
+              <button type="button" onClick={() => setWalletAction('withdraw')}>
+                <ArrowUpFromLine size={18} />
+                <span>
+                  <strong>Withdraw</strong>
+                  <small>Send USDC</small>
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <section className="staff-wallet-details-card">
+            <div className="staff-wallet-details-heading">
+              <div>
+                <p className="staff-eyebrow">Wallet details</p>
+                <h2>Deposit address</h2>
+              </div>
+              <span>ARC-TESTNET</span>
+            </div>
+            <div className="staff-wallet-address">
+              <code>{walletReady ? walletAddress : 'No wallet address is available for this account.'}</code>
+              <button type="button" onClick={copyWallet} disabled={!walletReady}>
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied' : 'Copy'}
+              </button>
+            </div>
+            <div className="staff-wallet-facts">
+              <div>
+                <CircleDollarSign size={17} />
+                <span><small>Asset</small><strong>USDC</strong></span>
+              </div>
+              <div>
+                <ShieldCheck size={17} />
+                <span><small>Wallet provider</small><strong>Circle</strong></span>
+              </div>
+            </div>
+          </section>
         </div>
 
         <section className="staff-list-section">
@@ -365,6 +410,58 @@ export default function StaffDashboard({
             </div>
           )}
         </section>
+
+        {walletAction && (
+          <div className="staff-wallet-modal-backdrop" role="presentation" onMouseDown={() => setWalletAction(null)}>
+            <section
+              className="staff-wallet-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="wallet-action-title"
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <button className="staff-wallet-modal-close" type="button" onClick={() => setWalletAction(null)} aria-label="Close">
+                <X size={18} />
+              </button>
+
+              {walletAction === 'deposit' ? (
+                <>
+                  <span className="staff-wallet-modal-icon deposit"><ArrowDownToLine size={22} /></span>
+                  <p className="staff-eyebrow">Receive funds</p>
+                  <h2 id="wallet-action-title">Deposit USDC</h2>
+                  <p>Send Arc USDC to the wallet address below. Other networks or unsupported assets may not arrive.</p>
+                  <div className="staff-wallet-modal-address">
+                    <span>ARC-TESTNET</span>
+                    <code>{walletReady ? walletAddress : 'Wallet address unavailable'}</code>
+                  </div>
+                  <button className="staff-wallet-modal-primary" type="button" onClick={copyWallet} disabled={!walletReady}>
+                    {copied ? <Check size={17} /> : <Copy size={17} />}
+                    {copied ? 'Address copied' : 'Copy deposit address'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="staff-wallet-modal-icon withdraw"><ArrowUpFromLine size={22} /></span>
+                  <p className="staff-eyebrow">Send funds</p>
+                  <h2 id="wallet-action-title">Withdraw USDC</h2>
+                  <p>
+                    Withdrawal is not enabled yet. A real Circle transaction approval flow must be connected before funds can be sent safely.
+                  </p>
+                  <div className="staff-wallet-unavailable">
+                    <ShieldCheck size={18} />
+                    <span>
+                      <strong>No transaction will be created</strong>
+                      <small>Your balance and wallet remain unchanged.</small>
+                    </span>
+                  </div>
+                  <button className="staff-wallet-modal-secondary" type="button" onClick={() => setWalletAction(null)}>
+                    Back to wallet
+                  </button>
+                </>
+              )}
+            </section>
+          </div>
+        )}
       </section>
     );
   }

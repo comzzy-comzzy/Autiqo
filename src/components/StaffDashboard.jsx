@@ -470,7 +470,7 @@ export default function StaffDashboard({
     <section className="staff-page">
       <header className="staff-dashboard-header">
         <div>
-          <p className="staff-eyebrow">Employee workspace</p>
+          <p className="staff-eyebrow">Staff workspace</p>
           <h1>{name ? `Welcome back, ${name.split(' ')[0]}` : 'Welcome to your workspace'}</h1>
           <p>Review what needs your attention and keep your work records up to date.</p>
         </div>

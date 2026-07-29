@@ -30,6 +30,15 @@ function readStaffSession() {
   }
 }
 
+function saveUserProfile(user) {
+  if (!user.email) return;
+  try {
+    window.localStorage.setItem(`autiqo.profile.${user.email.toLowerCase()}`, JSON.stringify(user));
+  } catch {
+    // Keep the in-memory profile usable when browser storage is unavailable or full.
+  }
+}
+
 function toStaffRecord(user) {
   return {
     ...user,
@@ -239,16 +248,19 @@ export default function App() {
           onClose={() => setShowProfileModal(false)}
           onUpdateUser={(updated) => {
             const nextUser = { ...currentUser, ...updated };
-            setCurrentUser(nextUser);
-            if (nextUser.email) {
-              window.localStorage.setItem(`autiqo.profile.${nextUser.email.toLowerCase()}`, JSON.stringify(nextUser));
-              setStaffRecords((records) => records.some((record) => record.email === nextUser.email)
-                ? records.map((record) => record.email === nextUser.email ? toStaffRecord(nextUser) : record)
-                : [...records, toStaffRecord(nextUser)]);
-            }
-            if (userRole === 'staff') {
-              setShowProfileModal(false);
-              setActiveTab('staff-overview');
+            try {
+              setCurrentUser(nextUser);
+              saveUserProfile(nextUser);
+              if (nextUser.email) {
+                setStaffRecords((records) => records.some((record) => record.email === nextUser.email)
+                  ? records.map((record) => record.email === nextUser.email ? toStaffRecord(nextUser) : record)
+                  : [...records, toStaffRecord(nextUser)]);
+              }
+            } finally {
+              if (userRole === 'staff') {
+                setShowProfileModal(false);
+                setActiveTab('staff-overview');
+              }
             }
           }}
         />
@@ -337,8 +349,8 @@ export default function App() {
                 onUpdateUser={(updated) => {
                   const nextUser = { ...currentUser, ...updated };
                   setCurrentUser(nextUser);
+                  saveUserProfile(nextUser);
                   if (nextUser.email) {
-                    window.localStorage.setItem(`autiqo.profile.${nextUser.email.toLowerCase()}`, JSON.stringify(nextUser));
                     setStaffRecords((records) => records.some((record) => record.email === nextUser.email)
                       ? records.map((record) => record.email === nextUser.email ? toStaffRecord(nextUser) : record)
                       : [...records, toStaffRecord(nextUser)]);

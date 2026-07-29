@@ -129,18 +129,21 @@ export default function StaffDashboard({
 
   function saveProfile(event) {
     event.preventDefault();
-    onUpdateUser({
-      name: name.trim(),
-      profile: {
-        ...profile,
+    try {
+      onUpdateUser({
         name: name.trim(),
-        work: work.trim(),
-        phone: phone.trim(),
-        currentTask: currentTask.trim()
-      }
-    });
-    setProfileSaved(true);
-    setActiveTab('staff-overview');
+        profile: {
+          ...profile,
+          name: name.trim(),
+          work: work.trim(),
+          phone: phone.trim(),
+          currentTask: currentTask.trim()
+        }
+      });
+      setProfileSaved(true);
+    } finally {
+      setActiveTab('staff-overview');
+    }
   }
 
   function chooseProofFiles(event) {

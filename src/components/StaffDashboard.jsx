@@ -17,6 +17,7 @@ import {
   Wallet,
   X
 } from 'lucide-react';
+import { AFRICAN_COUNTRY_CODES, splitAfricanPhone } from '../lib/african-country-codes';
 
 const MAX_PROOF_SIZE = 100 * 1024 * 1024;
 const PROOF_DATABASE = 'autiqo-proof-files';
@@ -95,9 +96,11 @@ export default function StaffDashboard({
   onUpdateUser = () => {}
 }) {
   const profile = currentUser.profile || {};
+  const savedPhone = splitAfricanPhone(profile.phone);
   const [name, setName] = useState(profile.name || currentUser.name || '');
   const [work, setWork] = useState(profile.work || '');
-  const [phone, setPhone] = useState(profile.phone || '');
+  const [phoneCountryCode, setPhoneCountryCode] = useState(savedPhone.countryCode);
+  const [phoneNumber, setPhoneNumber] = useState(savedPhone.localNumber);
   const [currentTask, setCurrentTask] = useState(profile.currentTask || '');
   const [profileSaved, setProfileSaved] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -115,8 +118,12 @@ export default function StaffDashboard({
   const proofSubmissions = currentUser.proofSubmissions || [];
   const tasks = currentUser.tasks || [];
 
-  const profileFields = [name, currentUser.email, phone, work, currentTask];
-  const completedProfileFields = profileFields.filter((value) => String(value || '').trim()).length;
+  const normalizedPhoneNumber = phoneNumber.replace(/\D/g, '');
+  const phoneComplete = normalizedPhoneNumber.length >= 6 && normalizedPhoneNumber.length <= 15;
+  const profileFields = [name, currentUser.email, phoneComplete, work, currentTask];
+  const completedProfileFields = profileFields.filter((value) => (
+    typeof value === 'boolean' ? value : String(value || '').trim()
+  )).length;
   const profileCompletion = Math.round((completedProfileFields / profileFields.length) * 100);
   const profileComplete = profileCompletion === 100;
   const userTransactions = useMemo(() => (
@@ -139,7 +146,7 @@ export default function StaffDashboard({
           ...profile,
           name: name.trim(),
           work: work.trim(),
-          phone: phone.trim(),
+          phone: `${phoneCountryCode}${normalizedPhoneNumber}`,
           currentTask: currentTask.trim()
         }
       });
@@ -261,7 +268,31 @@ export default function StaffDashboard({
               </label>
               <label>
                 Phone number
-                <input value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" placeholder="Add a phone number" />
+                <div className="staff-phone-field">
+                  <select
+                    value={phoneCountryCode}
+                    onChange={(event) => setPhoneCountryCode(event.target.value)}
+                    aria-label="Phone country code"
+                  >
+                    {AFRICAN_COUNTRY_CODES.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name} ({country.code})
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    required
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={18}
+                    pattern="(?:[0-9] ?){6,15}"
+                    value={phoneNumber}
+                    onChange={(event) => setPhoneNumber(event.target.value.replace(/[^0-9 ]/g, ''))}
+                    autoComplete="tel-national"
+                    placeholder="Phone number"
+                  />
+                </div>
+                <small>Select your country code, then enter your number without the international prefix.</small>
               </label>
             </div>
           </div>

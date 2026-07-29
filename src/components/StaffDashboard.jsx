@@ -18,15 +18,63 @@ import {
   X
 } from 'lucide-react';
 
-const MAX_PROOF_SIZE = 2 * 1024 * 1024;
+const MAX_PROOF_SIZE = 100 * 1024 * 1024;
+const PROOF_DATABASE = 'autiqo-proof-files';
+const PROOF_STORE = 'files';
+
+function openProofDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open(PROOF_DATABASE, 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(PROOF_STORE)) {
+        request.result.createObjectStore(PROOF_STORE, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+async function storeProofFiles(files) {
+  const database = await openProofDatabase();
+  await new Promise((resolve, reject) => {
+    const transaction = database.transaction(PROOF_STORE, 'readwrite');
+    const store = transaction.objectStore(PROOF_STORE);
+    files.forEach((file) => store.put(file));
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error);
+  });
+  database.close();
+}
+
+async function getProofFile(id) {
+  const database = await openProofDatabase();
+  const record = await new Promise((resolve, reject) => {
+    const request = database.transaction(PROOF_STORE, 'readonly').objectStore(PROOF_STORE).get(id);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  database.close();
+  return record;
+}
 
 function formatDate(value) {
   if (!value) return '';
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? new Date(`${value}T00:00:00`)
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat('en', {
     day: 'numeric',
     month: 'short',
     year: 'numeric'
-  }).format(new Date(value));
+  }).format(date);
+}
+
+function formatFileSize(bytes) {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.ceil(bytes / 1024))} KB`;
 }
 
 function EmptyState({ icon: Icon, title, children }) {
@@ -55,11 +103,11 @@ export default function StaffDashboard({
   const [copied, setCopied] = useState(false);
   const [walletAction, setWalletAction] = useState(null);
 
-  const [proofPeriod, setProofPeriod] = useState('');
-  const [proofNote, setProofNote] = useState('');
-  const [proofFile, setProofFile] = useState(null);
+  const [proofDate, setProofDate] = useState('');
+  const [proofFiles, setProofFiles] = useState([]);
   const [proofError, setProofError] = useState('');
   const [proofSaved, setProofSaved] = useState(false);
+  const [proofSubmitting, setProofSubmitting] = useState(false);
 
   const walletAddress = currentUser.wallet?.address || '';
   const walletReady = /^0x[a-fA-F0-9]{40}$/.test(walletAddress);
@@ -95,55 +143,79 @@ export default function StaffDashboard({
     window.setTimeout(() => setProfileSaved(false), 2200);
   }
 
-  function chooseProofFile(event) {
-    const file = event.target.files?.[0] || null;
+  function chooseProofFiles(event) {
+    const files = Array.from(event.target.files || []);
     setProofError('');
     setProofSaved(false);
 
-    if (file && file.size > MAX_PROOF_SIZE) {
-      setProofFile(null);
-      setProofError('Choose a file smaller than 2 MB.');
+    const oversizedFile = files.find((file) => file.size > MAX_PROOF_SIZE);
+    if (oversizedFile) {
+      setProofFiles([]);
+      setProofError(`${oversizedFile.name} is larger than 100 MB.`);
       event.target.value = '';
       return;
     }
 
-    setProofFile(file);
+    setProofFiles(files);
   }
 
-  function submitProof(event) {
+  async function submitProof(event) {
     event.preventDefault();
     setProofError('');
 
-    if (!proofPeriod || !proofFile) {
-      setProofError('Add the reporting period and choose a file.');
+    if (!proofDate || proofFiles.length === 0) {
+      setProofError('Select a work date and choose at least one file.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onerror = () => setProofError('This file could not be read. Please choose it again.');
-    reader.onload = () => {
+    setProofSubmitting(true);
+    try {
+      const submissionId = `proof-${Date.now()}`;
+      const storedFiles = proofFiles.map((file, index) => ({
+        id: `${submissionId}-${index}`,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        blob: file
+      }));
+      await storeProofFiles(storedFiles);
+
       const submission = {
-        id: `proof-${Date.now()}`,
-        period: proofPeriod,
-        note: proofNote.trim(),
-        fileName: proofFile.name,
-        fileType: proofFile.type,
-        fileSize: proofFile.size,
-        fileData: reader.result,
+        id: submissionId,
+        period: proofDate,
+        fileName: proofFiles.length === 1 ? proofFiles[0].name : `${proofFiles.length} files`,
+        files: storedFiles.map(({ blob, ...file }) => file),
         submittedAt: new Date().toISOString()
       };
 
       onUpdateUser({
         proofSubmissions: [submission, ...proofSubmissions]
       });
-      setProofPeriod('');
-      setProofNote('');
-      setProofFile(null);
+      setProofDate('');
+      setProofFiles([]);
       event.target.reset();
       setProofSaved(true);
       window.setTimeout(() => setProofSaved(false), 2600);
-    };
-    reader.readAsDataURL(proofFile);
+    } catch {
+      setProofError('The selected files could not be saved. Check browser storage and try again.');
+    } finally {
+      setProofSubmitting(false);
+    }
+  }
+
+  async function downloadProofFile(file) {
+    try {
+      const record = await getProofFile(file.id);
+      if (!record?.blob) throw new Error('File not found');
+      const url = URL.createObjectURL(record.blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setProofError(`${file.name} is not available in this browser.`);
+    }
   }
 
   async function copyWallet() {
@@ -223,48 +295,52 @@ export default function StaffDashboard({
           </button>
           <p className="staff-eyebrow">Work records</p>
           <h1>Proof of work</h1>
-          <p>Submit a file for a completed reporting period. This does not change your profile.</p>
+          <p>Submit one or more files for a selected work date. This does not change your profile.</p>
         </header>
 
         <form className="staff-form-card staff-proof-form" onSubmit={submitProof}>
           <div className="staff-form-section">
             <div>
               <h2>New submission</h2>
-              <p>PDF, Word document, or image. Maximum file size is 2 MB.</p>
+              <p>PDF, Word document, or image. Maximum file size is 100 MB.</p>
             </div>
             <div className="staff-form-fields">
               <label>
-                Reporting period
+                Work date
                 <input
+                  type="date"
                   required
-                  value={proofPeriod}
-                  onChange={(event) => setProofPeriod(event.target.value)}
-                  placeholder="For example, 15–28 July 2026"
-                />
-              </label>
-              <label>
-                Note <span className="staff-optional">Optional</span>
-                <textarea
-                  rows={3}
-                  value={proofNote}
-                  onChange={(event) => setProofNote(event.target.value)}
-                  placeholder="Add context for your reviewer"
+                  value={proofDate}
+                  onChange={(event) => setProofDate(event.target.value)}
                 />
               </label>
               <label className="staff-file-picker">
                 <Upload size={20} />
                 <span>
-                  <strong>{proofFile ? proofFile.name : 'Choose a file'}</strong>
-                  <small>{proofFile ? `${Math.ceil(proofFile.size / 1024)} KB selected` : 'PDF, DOC, DOCX, PNG, or JPG'}</small>
+                  <strong>{proofFiles.length ? `${proofFiles.length} file${proofFiles.length === 1 ? '' : 's'} selected` : 'Choose files'}</strong>
+                  <small>{proofFiles.length ? `${formatFileSize(proofFiles.reduce((total, file) => total + file.size, 0))} total` : 'PDF, DOC, DOCX, PNG, or JPG'}</small>
                 </span>
-                <input type="file" accept="image/png,image/jpeg,.pdf,.doc,.docx" onChange={chooseProofFile} />
+                <input type="file" multiple accept="image/png,image/jpeg,.pdf,.doc,.docx" onChange={chooseProofFiles} />
               </label>
+              {proofFiles.length > 0 && (
+                <div className="staff-selected-files">
+                  {proofFiles.map((file) => (
+                    <span key={`${file.name}-${file.lastModified}`}>
+                      <FileText size={15} />
+                      <strong>{file.name}</strong>
+                      <small>{formatFileSize(file.size)}</small>
+                    </span>
+                  ))}
+                </div>
+              )}
               {proofError && <p className="staff-form-error">{proofError}</p>}
             </div>
           </div>
           <div className="staff-form-footer">
             {proofSaved && <span className="staff-inline-success"><Check size={16} /> Proof saved</span>}
-            <button className="btn-primary" type="submit">Submit proof</button>
+            <button className="btn-primary" type="submit" disabled={proofSubmitting}>
+              {proofSubmitting ? 'Saving files...' : 'Submit proof'}
+            </button>
           </div>
         </form>
 
@@ -286,13 +362,21 @@ export default function StaffDashboard({
                 <article className="staff-proof-row" key={submission.id}>
                   <span className="staff-row-icon"><FileCheck2 size={19} /></span>
                   <div>
-                    <strong>{submission.period}</strong>
-                    <p>{submission.note || submission.fileName}</p>
+                    <strong>{formatDate(submission.period)}</strong>
+                    <p>{submission.files?.length ? `${submission.files.length} file${submission.files.length === 1 ? '' : 's'}` : submission.note || submission.fileName}</p>
                   </div>
                   <div className="staff-proof-meta">
                     <span>{formatDate(submission.submittedAt)}</span>
-                    {submission.fileData ? (
-                      <a href={submission.fileData} download={submission.fileName}>Download</a>
+                    {submission.files?.length ? (
+                      <div className="staff-proof-downloads">
+                        {submission.files.map((file) => (
+                          <button type="button" key={file.id} onClick={() => downloadProofFile(file)}>
+                            Download {file.name}
+                          </button>
+                        ))}
+                      </div>
+                    ) : submission.fileData ? (
+                      <a href={submission.fileData} download={submission.fileName}>Download {submission.fileName}</a>
                     ) : (
                       <span>{submission.fileName}</span>
                     )}
@@ -557,7 +641,7 @@ export default function StaffDashboard({
               <div className="staff-latest-proof">
                 <FileCheck2 size={20} />
                 <div>
-                  <strong>{proofSubmissions[0].period}</strong>
+                  <strong>{formatDate(proofSubmissions[0].period)}</strong>
                   <span>Submitted {formatDate(proofSubmissions[0].submittedAt)}</span>
                 </div>
               </div>

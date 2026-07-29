@@ -64,19 +64,18 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
       />
       <div className={`nav-drawer ${isOpen ? 'open' : ''}`}>
         <div className="drawer-header">
-          <div className="drawer-brand">
-            <img src="/logo-icon.png" alt="Autiqo Logo" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo-icon.png" alt="Autiqo Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
             <div>
-              <div className="drawer-brand-name">Autiqo</div>
-              <div className="drawer-brand-role">
+              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#0369a1', lineHeight: 1.1 }}>Autiqo AI</div>
+              <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>
                 {userRole === 'admin' ? 'Employer Portal' : 'Employee Portal'}
               </div>
             </div>
           </div>
           <button 
-            className="drawer-close"
             onClick={onClose} 
-            aria-label="Close navigation"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }}
           >
             <X size={20} />
           </button>
@@ -85,7 +84,7 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
         <div className="drawer-content">
           {menuSections.map((section, idx) => (
             <div key={idx}>
-              <div className="drawer-section-title">{userRole === 'staff' ? 'Your workspace' : section.title}</div>
+              <div className="drawer-section-title">{section.title}</div>
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -98,7 +97,7 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
                       onClose();
                     }}
                   >
-                    <Icon size={18} />
+                    <Icon size={18} color={isActive ? '#0284c7' : '#64748b'} />
                     <span>{item.label}</span>
                     {item.badge && <span className="drawer-badge">{item.badge}</span>}
                   </div>

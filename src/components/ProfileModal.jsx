@@ -20,7 +20,6 @@ export default function ProfileModal({ currentUser, userRole, onClose, onUpdateU
   const [tin, setTin] = useState('24910482-001');
   const [pensionPin, setPensionPin] = useState('PEN1092840192');
   const [arcWallet, setArcWallet] = useState(currentUser.wallet?.address || '');
-  const [bankAccount, setBankAccount] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleSave = (e) => {
@@ -152,22 +151,13 @@ export default function ProfileModal({ currentUser, userRole, onClose, onUpdateU
               <h4 style={{ fontWeight: 800, fontSize: '0.9rem', color: '#3730a3', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Wallet size={16} color="#4338ca" /> Arc USDC Wallet Setup
               </h4>
-              <div style={{ marginBottom: '10px' }}>
+              <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#4338ca', fontWeight: 700 }}>Arc Wallet Address (EVM Compatible)</label>
                 <input 
                   type="text" 
                   value={arcWallet}
                   onChange={e => setArcWallet(e.target.value)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.85rem', fontFamily: 'monospace' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#4338ca', fontWeight: 700 }}>Fallback Local Bank Account</label>
-                <input 
-                  type="text" 
-                  value={bankAccount} 
-                  onChange={e => setBankAccount(e.target.value)}
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.85rem' }}
                 />
               </div>
             </div>

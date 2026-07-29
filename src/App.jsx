@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
   Banknote,
-  Bell,
   Building2,
   Globe,
   LockKeyhole,
+  LogOut,
   Menu,
   ShieldCheck,
   Users,
@@ -222,7 +222,7 @@ export default function App() {
       )}
 
       <div className="app-container">
-        <header className="top-nav">
+        <header className={`top-nav ${isAuthenticated && userRole === 'staff' ? 'staff-top-nav' : ''}`}>
           <div className="nav-left">
             {isAuthenticated && (
               <button className="menu-toggle" onClick={() => setIsDrawerOpen(true)} title="Open Navigation Menu">
@@ -268,7 +268,7 @@ export default function App() {
                   onClick={handleLogout}
                   title="Sign Out / Lock Workspace"
                 >
-                  <Bell size={18} />
+                  <LogOut size={18} />
                 </button>
               </>
             )}
@@ -287,7 +287,7 @@ export default function App() {
         )}
 
         {isAuthenticated ? (
-          <main className="main-wrapper">
+          <main className={`main-wrapper ${userRole === 'staff' ? 'staff-main-wrapper' : ''}`}>
             {userRole === 'staff' ? (
               <StaffDashboard
                 activeTab={activeTab}

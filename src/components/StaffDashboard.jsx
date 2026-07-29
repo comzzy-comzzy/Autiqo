@@ -115,7 +115,10 @@ export default function StaffDashboard({
   const proofSubmissions = currentUser.proofSubmissions || [];
   const tasks = currentUser.tasks || [];
 
-  const profileComplete = Boolean(name.trim() && work.trim());
+  const profileFields = [name, currentUser.email, phone, work, currentTask];
+  const completedProfileFields = profileFields.filter((value) => String(value || '').trim()).length;
+  const profileCompletion = Math.round((completedProfileFields / profileFields.length) * 100);
+  const profileComplete = profileCompletion === 100;
   const userTransactions = useMemo(() => (
     ledger.filter((entry) => {
       const actor = String(entry.actor || '').toLowerCase();
@@ -580,10 +583,10 @@ export default function StaffDashboard({
           <span className="staff-action-icon"><UserRound size={20} /></span>
           <span>
             <small>Profile</small>
-            <strong>{profileComplete ? 'Details are up to date' : 'Complete your details'}</strong>
+            <strong>{profileComplete ? 'All details are up to date' : `${profileCompletion}% profile completed`}</strong>
           </span>
           <span className={`staff-status ${profileComplete ? 'is-ready' : ''}`}>
-            {profileComplete ? 'Complete' : 'Action needed'}
+            {profileComplete ? 'Completed' : `${profileCompletion}%`}
           </span>
         </button>
         <button type="button" onClick={() => setActiveTab('staff-work-proof')}>

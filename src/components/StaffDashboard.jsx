@@ -559,7 +559,11 @@ export default function StaffDashboard({
           <p>Review what needs your attention and keep your work records up to date.</p>
         </div>
         <button className="staff-profile-link" type="button" onClick={() => setActiveTab('staff-profile')}>
-          <span className="staff-avatar">{name ? name.charAt(0).toUpperCase() : <UserRound size={18} />}</span>
+          <span className="staff-avatar">
+            {currentUser.profilePhoto ? (
+              <img src={currentUser.profilePhoto} alt="" />
+            ) : name ? name.charAt(0).toUpperCase() : <UserRound size={18} />}
+          </span>
           <span>
             <strong>{name || 'Complete your profile'}</strong>
             <small>{work || currentUser.email || 'No role added'}</small>

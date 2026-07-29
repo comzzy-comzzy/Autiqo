@@ -8,10 +8,10 @@ import {
   CheckCircle, 
   X, 
   Save, 
-  Key, 
-  CreditCard,
-  Building
+  Camera,
+  Trash2
 } from 'lucide-react';
+import { createProfileImage } from '../lib/profile-image';
 
 export default function ProfileModal({ currentUser, userRole, onClose, onUpdateUser }) {
   const [name, setName] = useState(currentUser.name || '');
@@ -20,15 +20,30 @@ export default function ProfileModal({ currentUser, userRole, onClose, onUpdateU
   const [tin, setTin] = useState('24910482-001');
   const [pensionPin, setPensionPin] = useState('PEN1092840192');
   const [arcWallet, setArcWallet] = useState(currentUser.wallet?.address || '');
-  const [bankAccount, setBankAccount] = useState('');
+  const [profilePhoto, setProfilePhoto] = useState(currentUser.profilePhoto || '');
+  const [photoError, setPhotoError] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  const handlePhotoChange = async (event) => {
+    const file = event.target.files?.[0];
+    setPhotoError('');
+    if (!file) return;
+
+    try {
+      setProfilePhoto(await createProfileImage(file));
+    } catch (error) {
+      setPhotoError(error.message);
+      event.target.value = '';
+    }
+  };
 
   const handleSave = (e) => {
     e.preventDefault();
     onUpdateUser({
       name,
       email,
-      company
+      company,
+      profilePhoto
     });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2000);
@@ -81,6 +96,33 @@ export default function ProfileModal({ currentUser, userRole, onClose, onUpdateU
         )}
 
         <form onSubmit={handleSave}>
+          <div className="profile-photo-editor">
+            <div className="profile-photo-preview">
+              {profilePhoto ? (
+                <img src={profilePhoto} alt={`${name || 'User'} profile`} />
+              ) : (
+                <span>{name ? name.charAt(0).toUpperCase() : 'U'}</span>
+              )}
+            </div>
+            <div className="profile-photo-copy">
+              <strong>Profile photo</strong>
+              <small>PNG, JPG, or WebP. Maximum 5 MB.</small>
+              <div className="profile-photo-actions">
+                <label className="profile-photo-upload">
+                  <Camera size={16} />
+                  {profilePhoto ? 'Change photo' : 'Add photo'}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handlePhotoChange} />
+                </label>
+                {profilePhoto && (
+                  <button type="button" onClick={() => { setProfilePhoto(''); setPhotoError(''); }}>
+                    <Trash2 size={15} /> Remove
+                  </button>
+                )}
+              </div>
+              {photoError && <span className="profile-photo-error">{photoError}</span>}
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>
@@ -159,15 +201,6 @@ export default function ProfileModal({ currentUser, userRole, onClose, onUpdateU
                   value={arcWallet}
                   onChange={e => setArcWallet(e.target.value)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.85rem', fontFamily: 'monospace' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#4338ca', fontWeight: 700 }}>Fallback Local Bank Account</label>
-                <input 
-                  type="text" 
-                  value={bankAccount} 
-                  onChange={e => setBankAccount(e.target.value)}
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a5b4fc', fontSize: '0.85rem' }}
                 />
               </div>
             </div>

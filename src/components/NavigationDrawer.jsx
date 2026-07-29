@@ -12,10 +12,11 @@ import {
   ArrowUpRight,
   FileCheck2,
   LayoutDashboard,
-  UserCheck
+  UserCheck,
+  LogOut
 } from 'lucide-react';
 
-export default function NavigationDrawer({ isOpen, onClose, activeTab, setActiveTab, workerCount, userRole }) {
+export default function NavigationDrawer({ isOpen, onClose, activeTab, setActiveTab, workerCount, userRole, onLogout }) {
   const adminSections = [
     {
       title: "Employer Operations",
@@ -116,6 +117,14 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
             </div>
           )}
         </div>
+        {userRole === 'staff' && (
+          <div className="drawer-footer">
+            <button className="drawer-signout" type="button" onClick={onLogout}>
+              <LogOut size={18} />
+              <span>Sign out</span>
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

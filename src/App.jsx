@@ -192,6 +192,7 @@ export default function App() {
       setCurrentUser((previous) => ({
         ...previous,
         name: saved.name || previous.name,
+        profilePhoto: saved.profilePhoto || '',
         profile: saved.profile || {},
         proofSubmissions: saved.proofSubmissions || [],
         tasks: saved.tasks || []
@@ -286,18 +287,24 @@ export default function App() {
                   title="View Account Profile Settings"
                 >
                   <div className="user-avatar">
-                    {currentUser.name ? currentUser.name.split(' ').map((n) => n[0]).join('') : 'GU'}
+                    {currentUser.profilePhoto ? (
+                      <img src={currentUser.profilePhoto} alt="" />
+                    ) : (
+                      currentUser.name ? currentUser.name.split(' ').map((n) => n[0]).join('') : 'GU'
+                    )}
                   </div>
                   <span className="user-name">{currentUser.name}</span>
                 </button>
 
-                <button
-                  className="nav-icon-btn"
-                  onClick={handleLogout}
-                  title="Sign Out / Lock Workspace"
-                >
-                  <Bell size={18} />
-                </button>
+                {userRole === 'admin' && (
+                  <button
+                    className="nav-icon-btn"
+                    onClick={handleLogout}
+                    title="Sign Out / Lock Workspace"
+                  >
+                    <Bell size={18} />
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -311,6 +318,7 @@ export default function App() {
             setActiveTab={setActiveTab}
             workerCount={workers.length}
             userRole={userRole}
+            onLogout={handleLogout}
           />
         )}
 

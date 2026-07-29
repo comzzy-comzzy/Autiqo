@@ -110,18 +110,13 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
     const primaryWallet = wallets.find((item) => item.blockchain === 'ARC-TESTNET') || wallets[0] || null;
 
     if (!primaryWallet) {
-      const pendingWallet = {
-        id: 'Circle wallet pending',
-        address: 'Creating Arc wallet...',
-        blockchain: 'ARC-TESTNET'
-      };
-      setWallet(pendingWallet);
-      setStatusMessage('Email verified. Your Arc wallet dashboard is opening.');
-      finishLogin(pendingWallet, '0');
-      return pendingWallet;
+      setWallet(null);
+      setStatusMessage('Circle is still preparing your wallet. Please try again.');
+      throw new Error('No Circle wallet is available for this account yet.');
     }
 
     setWallet(primaryWallet);
+    let balance = null;
 
     try {
       const balanceData = await circleAction('getTokenBalance', {
@@ -134,8 +129,8 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
         const name = item.token?.name || '';
         return symbol.includes('USDC') || name.includes('USDC');
       });
-    const balance = usdc?.amount || '0';
-    setUsdcBalance(balance);
+      balance = usdc?.amount || '0';
+      setUsdcBalance(balance);
     } catch {
       setUsdcBalance(null);
     }
@@ -180,14 +175,9 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
       if (error.code === 155106 || String(error.message || '').includes('155106')) {
         await loadWallets(credentials.userToken);
       } else {
-        const pendingWallet = {
-          id: 'Circle wallet pending',
-          address: 'Wallet recovery in progress',
-          blockchain: 'ARC-TESTNET'
-        };
-        setWallet(pendingWallet);
-        setStatusMessage('Email verified. Opening your dashboard while Circle finishes wallet recovery.');
-        finishLogin(pendingWallet, '0');
+        setWallet(null);
+        setErrorMessage(error.message || error.error || 'Circle could not prepare your wallet.');
+        setStatusMessage('Wallet setup did not finish. Please try again.');
       }
     } finally {
       setIsBusy(false);
@@ -217,19 +207,35 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
       return;
     }
 
-    setIsBusy(true);
-    // Instant seamless login into staff dashboard with generated Arc wallet
-    const generatedWallet = {
-      id: `arc-wallet-${email.split('@')[0]}`,
-      address: `0x20658b2bbc6abbea3bdb5912b2062a84695fbb85`,
-      blockchain: 'ARC-TESTNET'
-    };
+    if (!circleAppId || !sdkReady || !deviceId || !sdkRef.current) {
+      setErrorMessage('Circle wallet sign-in is not configured yet.');
+      setStatusMessage('Ask the workspace administrator to finish the Circle setup.');
+      return;
+    }
 
-    setStatusMessage('Email verified! Opening your Staff Dashboard...');
-    window.setTimeout(() => {
-      finishLogin(generatedWallet, '0.00');
+    setIsBusy(true);
+    try {
+      const otp = await circleAction('requestEmailOtp', {
+        deviceId,
+        email: email.trim(),
+        adminOnly
+      });
+      sdkRef.current.updateConfigs({
+        appSettings: { appId: circleAppId },
+        loginConfigs: {
+          deviceToken: otp.deviceToken,
+          deviceEncryptionKey: otp.deviceEncryptionKey,
+          otpToken: otp.otpToken
+        }
+      });
+      setStatusMessage('Check your email and enter the code in the Circle verification window.');
+      sdkRef.current.verifyOtp();
+    } catch (error) {
+      setErrorMessage(error.error || error.message || 'Circle could not send a verification code.');
+      setStatusMessage('Email verification could not be started.');
+    } finally {
       setIsBusy(false);
-    }, 400);
+    }
   }
 
   return (
@@ -273,18 +279,8 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
 
           <div className="auth-action-grid single" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button type="submit" className="btn-primary" disabled={isBusy}>
-              <Mail size={17} /> {isBusy ? 'Verifying...' : 'Send Code & Open Dashboard'}
+              <Mail size={17} /> {isBusy ? 'Sending code...' : 'Send email code'}
             </button>
-            {email && email.includes('@') && (
-              <button 
-                type="button" 
-                className="btn-secondary" 
-                onClick={() => finishLogin({ id: 'Circle wallet active', address: '0x20658b2bbc6abbea3bdb5912b2062a84695fbb85', blockchain: 'ARC-TESTNET' }, '0')}
-                style={{ fontSize: '0.85rem' }}
-              >
-                Access Dashboard Directly →
-              </button>
-            )}
           </div>
         </form>
       </div>

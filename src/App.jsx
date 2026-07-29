@@ -17,6 +17,13 @@ import StaffDashboard from './components/StaffDashboard';
 import AuthModal from './components/AuthModal';
 import ProfileModal from './components/ProfileModal';
 
+function toStaffRecord(user) {
+  return {
+    ...user,
+    proofSubmissions: (user.proofSubmissions || []).map(({ fileData, ...submission }) => submission)
+  };
+}
+
 function PublicLanding() {
   return (
     <main className="public-page">
@@ -150,7 +157,16 @@ export default function App() {
       usdcBalance: userPayload.usdcBalance
     });
     const savedProfile = window.localStorage.getItem(`autiqo.profile.${userPayload.email.toLowerCase()}`);
-    if (savedProfile) setCurrentUser((previous) => ({ ...previous, ...JSON.parse(savedProfile) }));
+    if (savedProfile) {
+      const saved = JSON.parse(savedProfile);
+      setCurrentUser((previous) => ({
+        ...previous,
+        name: saved.name || previous.name,
+        profile: saved.profile || {},
+        proofSubmissions: saved.proofSubmissions || [],
+        tasks: saved.tasks || []
+      }));
+    }
     setIsAuthenticated(true);
     setShowAuthModal(false);
     setActiveTab(userPayload.role === 'admin' ? 'dashboard' : 'staff-overview');
@@ -193,8 +209,8 @@ export default function App() {
             if (nextUser.email) {
               window.localStorage.setItem(`autiqo.profile.${nextUser.email.toLowerCase()}`, JSON.stringify(nextUser));
               setStaffRecords((records) => records.some((record) => record.email === nextUser.email)
-                ? records.map((record) => record.email === nextUser.email ? nextUser : record)
-                : [...records, nextUser]);
+                ? records.map((record) => record.email === nextUser.email ? toStaffRecord(nextUser) : record)
+                : [...records, toStaffRecord(nextUser)]);
             }
           }}
         />
@@ -278,8 +294,8 @@ export default function App() {
                   if (nextUser.email) {
                     window.localStorage.setItem(`autiqo.profile.${nextUser.email.toLowerCase()}`, JSON.stringify(nextUser));
                     setStaffRecords((records) => records.some((record) => record.email === nextUser.email)
-                      ? records.map((record) => record.email === nextUser.email ? nextUser : record)
-                      : [...records, nextUser]);
+                      ? records.map((record) => record.email === nextUser.email ? toStaffRecord(nextUser) : record)
+                      : [...records, toStaffRecord(nextUser)]);
                   }
                 }}
               />
@@ -316,7 +332,7 @@ export default function App() {
                   <div className="card-header"><h3 className="card-title"><Users size={20} /> Staff submissions</h3></div>
                   {staffRecords.length === 0 ? <p className="muted-copy">No staff profiles or work proof have been submitted yet.</p> : staffRecords.map((record) => (
                     <div className="staff-record-row" key={record.email}>
-                      <strong>{record.name || 'Unnamed staff'}</strong><span>{record.email}</span><span>{record.profile?.work || 'Profile incomplete'}</span><span>{record.profile?.currentTask || 'No current task'}</span><span>{record.profile?.proof || 'No proof submitted'}</span><span>{record.wallet?.address || 'Wallet unavailable'}</span>
+                      <strong>{record.name || 'Unnamed staff'}</strong><span>{record.email}</span><span>{record.profile?.work || 'Profile incomplete'}</span><span>{record.profile?.currentTask || 'No current task'}</span><span>{record.proofSubmissions?.[0]?.period || 'No proof submitted'}</span><span>{record.wallet?.address || 'Wallet unavailable'}</span>
                     </div>
                   ))}
                 </div>

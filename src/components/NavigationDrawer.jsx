@@ -10,8 +10,8 @@ import {
   Wallet, 
   Globe, 
   ArrowUpRight,
-  FileText,
-  CreditCard,
+  FileCheck2,
+  LayoutDashboard,
   UserCheck
 } from 'lucide-react';
 
@@ -46,8 +46,10 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
     {
       title: "Staff Workspace",
       items: [
-        { id: "staff-profile", label: "My Profile & Task", icon: UserCheck },
-        { id: "staff-payout-details", label: "Wallet Address", icon: Wallet },
+        { id: "staff-overview", label: "Overview", icon: LayoutDashboard },
+        { id: "staff-profile", label: "My Profile", icon: UserCheck },
+        { id: "staff-work-proof", label: "Proof of Work", icon: FileCheck2 },
+        { id: "staff-payout-details", label: "Payout Wallet", icon: Wallet },
       ]
     }
   ];
@@ -105,19 +107,11 @@ export default function NavigationDrawer({ isOpen, onClose, activeTab, setActive
           ))}
 
           {userRole === 'staff' && (
-            <div style={{ marginTop: '24px', padding: '16px', background: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd' }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>
-                Arc USDC Wallet Active
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '12px' }}>
-                Receive and withdraw salary through the Arc wallet tied to your email login.
-              </div>
-              <button 
-                className="btn-primary" 
-                style={{ width: '100%', padding: '8px 12px', fontSize: '0.8rem', justifyContent: 'center' }}
-                onClick={() => { setActiveTab('staff-payout-details'); onClose(); }}
-              >
-                Manage Payout Destination <ArrowUpRight size={14} />
+            <div className="drawer-staff-note">
+              <strong>Need to submit work?</strong>
+              <p>Proof of work has its own page, separate from your personal details.</p>
+              <button onClick={() => { setActiveTab('staff-work-proof'); onClose(); }}>
+                Open proof of work <ArrowUpRight size={14} />
               </button>
             </div>
           )}

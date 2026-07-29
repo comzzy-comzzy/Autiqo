@@ -1,348 +1,476 @@
 import React, { useMemo, useState } from 'react';
-import { 
-  ArrowDownRight, 
-  ArrowUpRight, 
-  CheckCircle, 
-  Copy, 
-  CreditCard, 
-  FileText, 
-  FileUp, 
-  History, 
-  ListTodo, 
-  PlusCircle, 
-  Save, 
-  ShieldCheck, 
-  Upload, 
-  User, 
-  Wallet 
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  ClipboardList,
+  Copy,
+  FileCheck2,
+  FileText,
+  Inbox,
+  Upload,
+  UserRound,
+  Wallet
 } from 'lucide-react';
 
-export default function StaffDashboard({ activeTab, setActiveTab, currentUser = {}, onUpdateUser = () => {} }) {
-  const [name, setName] = useState(currentUser.profile?.name || currentUser.name || '');
-  const [work, setWork] = useState(currentUser.profile?.work || '');
-  const [phone, setPhone] = useState(currentUser.profile?.phone || '');
-  const [currentTask, setCurrentTask] = useState(currentUser.profile?.currentTask || '');
-  const [proof, setProof] = useState(currentUser.profile?.proof || '');
-  const [saved, setSaved] = useState(false);
+const MAX_PROOF_SIZE = 2 * 1024 * 1024;
+
+function formatDate(value) {
+  if (!value) return '';
+  return new Intl.DateTimeFormat('en', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(value));
+}
+
+function EmptyState({ icon: Icon, title, children }) {
+  return (
+    <div className="staff-empty-state">
+      <span className="staff-empty-icon"><Icon size={20} /></span>
+      <strong>{title}</strong>
+      <p>{children}</p>
+    </div>
+  );
+}
+
+export default function StaffDashboard({
+  activeTab,
+  setActiveTab,
+  currentUser = {},
+  ledger = [],
+  onUpdateUser = () => {}
+}) {
+  const profile = currentUser.profile || {};
+  const [name, setName] = useState(profile.name || currentUser.name || '');
+  const [work, setWork] = useState(profile.work || '');
+  const [phone, setPhone] = useState(profile.phone || '');
+  const [currentTask, setCurrentTask] = useState(profile.currentTask || '');
+  const [profileSaved, setProfileSaved] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showDepositModal, setShowDepositModal] = useState(false);
-  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-  const [withdrawAddress, setWithdrawAddress] = useState('');
-  const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [transactionSuccess, setTransactionSuccess] = useState('');
+
+  const [proofPeriod, setProofPeriod] = useState('');
+  const [proofNote, setProofNote] = useState('');
+  const [proofFile, setProofFile] = useState(null);
+  const [proofError, setProofError] = useState('');
+  const [proofSaved, setProofSaved] = useState(false);
 
   const walletAddress = currentUser.wallet?.address || '';
-  const usdcBalance = currentUser.usdcBalance || '0.00';
+  const walletReady = /^0x[a-fA-F0-9]{40}$/.test(walletAddress);
+  const balanceAvailable = currentUser.usdcBalance !== null && currentUser.usdcBalance !== undefined;
+  const proofSubmissions = currentUser.proofSubmissions || [];
   const tasks = currentUser.tasks || [];
-  const profileComplete = useMemo(() => Boolean(name && work), [name, work]);
 
-  // Mock transaction history for realistic financial dashboard UI
-  const [history, setHistory] = useState([
-    { id: 'tx-1', type: 'Deposit', amount: '+ 500.00 USDC', date: '2026-07-20', status: 'Completed' },
-    { id: 'tx-2', type: 'Salary Payout', amount: '+ 1,250.00 USDC', date: '2026-07-15', status: 'Completed' }
-  ]);
+  const profileComplete = Boolean(name.trim() && work.trim());
+  const userTransactions = useMemo(() => (
+    ledger.filter((entry) => {
+      const actor = String(entry.actor || '').toLowerCase();
+      const recipient = String(entry.wallet || entry.recipient || '').toLowerCase();
+      return (
+        (name && actor === name.toLowerCase()) ||
+        (walletAddress && recipient === walletAddress.toLowerCase())
+      );
+    })
+  ), [ledger, name, walletAddress]);
 
   function saveProfile(event) {
     event.preventDefault();
-    onUpdateUser({ 
-      name, 
-      profile: { ...currentUser.profile, name, work, phone, currentTask, proof } 
+    onUpdateUser({
+      name: name.trim(),
+      profile: {
+        ...profile,
+        name: name.trim(),
+        work: work.trim(),
+        phone: phone.trim(),
+        currentTask: currentTask.trim()
+      }
     });
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2200);
+    setProfileSaved(true);
+    window.setTimeout(() => setProfileSaved(false), 2200);
   }
 
-  function handleCopyWallet() {
-    if (!walletAddress) return;
-    navigator.clipboard.writeText(walletAddress);
+  function chooseProofFile(event) {
+    const file = event.target.files?.[0] || null;
+    setProofError('');
+    setProofSaved(false);
+
+    if (file && file.size > MAX_PROOF_SIZE) {
+      setProofFile(null);
+      setProofError('Choose a file smaller than 2 MB.');
+      event.target.value = '';
+      return;
+    }
+
+    setProofFile(file);
+  }
+
+  function submitProof(event) {
+    event.preventDefault();
+    setProofError('');
+
+    if (!proofPeriod || !proofFile) {
+      setProofError('Add the reporting period and choose a file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => setProofError('This file could not be read. Please choose it again.');
+    reader.onload = () => {
+      const submission = {
+        id: `proof-${Date.now()}`,
+        period: proofPeriod,
+        note: proofNote.trim(),
+        fileName: proofFile.name,
+        fileType: proofFile.type,
+        fileSize: proofFile.size,
+        fileData: reader.result,
+        submittedAt: new Date().toISOString()
+      };
+
+      onUpdateUser({
+        proofSubmissions: [submission, ...proofSubmissions]
+      });
+      setProofPeriod('');
+      setProofNote('');
+      setProofFile(null);
+      event.target.reset();
+      setProofSaved(true);
+      window.setTimeout(() => setProofSaved(false), 2600);
+    };
+    reader.readAsDataURL(proofFile);
+  }
+
+  async function copyWallet() {
+    if (!walletReady) return;
+    await navigator.clipboard.writeText(walletAddress);
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-  }
-
-  function handleWithdrawSubmit(e) {
-    e.preventDefault();
-    if (!withdrawAddress || !withdrawAmount) return;
-    setTransactionSuccess(`Withdrawal request of ${withdrawAmount} USDC submitted.`);
-    setHistory((prev) => [
-      { id: `tx-${Date.now()}`, type: 'Withdrawal', amount: `- ${withdrawAmount} USDC`, date: new Date().toISOString().split('T')[0], status: 'Processing' },
-      ...prev
-    ]);
-    setWithdrawAddress('');
-    setWithdrawAmount('');
-    setShowWithdrawModal(false);
-    window.setTimeout(() => setTransactionSuccess(''), 4000);
+    window.setTimeout(() => setCopied(false), 1800);
   }
 
   if (activeTab === 'staff-profile') {
     return (
-      <section className="staff-clean-page">
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <User size={24} color="#0284c7" />
-            <h2 style={{ margin: 0 }}>My Staff Profile</h2>
+      <section className="staff-page staff-narrow-page">
+        <header className="staff-page-header">
+          <button className="staff-back-link" type="button" onClick={() => setActiveTab('staff-overview')}>
+            Overview
+          </button>
+          <p className="staff-eyebrow">Account</p>
+          <h1>Your profile</h1>
+          <p>Keep your contact details and current role accurate. Work evidence is submitted separately.</p>
+        </header>
+
+        <form className="staff-form-card" onSubmit={saveProfile}>
+          <div className="staff-form-section">
+            <div>
+              <h2>Personal details</h2>
+              <p>Information your employer uses to identify and contact you.</p>
+            </div>
+            <div className="staff-form-fields">
+              <label>
+                Full name
+                <input required value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" />
+              </label>
+              <label>
+                Work email
+                <input value={currentUser.email || ''} disabled />
+                <small>Your sign-in email cannot be changed here.</small>
+              </label>
+              <label>
+                Phone number
+                <input value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" placeholder="Add a phone number" />
+              </label>
+            </div>
           </div>
-          <p className="muted-copy">Fill in your full name, work role, current tasks, and biweekly work proof for admin review.</p>
-          
-          <form className="staff-profile-form" onSubmit={saveProfile} style={{ display: 'grid', gap: '16px', marginTop: '20px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
+          <div className="staff-form-section">
+            <div>
+              <h2>Work details</h2>
+              <p>Your role and the work currently on your desk.</p>
+            </div>
+            <div className="staff-form-fields">
               <label>
-                Full Name *
-                <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Ezinne Agwu" />
+                Job title
+                <input required value={work} onChange={(event) => setWork(event.target.value)} placeholder="Add your job title" />
               </label>
               <label>
-                Work / Job Title *
-                <input required value={work} onChange={(e) => setWork(e.target.value)} placeholder="e.g. Frontend Developer / Designer" />
+                Current focus
+                <textarea rows={4} value={currentTask} onChange={(event) => setCurrentTask(event.target.value)} placeholder="What are you working on right now?" />
               </label>
             </div>
+          </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <label>
-                Phone Number
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" />
-              </label>
-              <label>
-                Account Email
-                <input value={currentUser.email || ''} disabled style={{ background: '#f1f5f9', cursor: 'not-allowed' }} />
-              </label>
+          <div className="staff-form-footer">
+            {profileSaved && <span className="staff-inline-success"><Check size={16} /> Profile saved</span>}
+            <button className="btn-primary" type="submit">Save changes</button>
+          </div>
+        </form>
+      </section>
+    );
+  }
+
+  if (activeTab === 'staff-work-proof') {
+    return (
+      <section className="staff-page staff-narrow-page">
+        <header className="staff-page-header">
+          <button className="staff-back-link" type="button" onClick={() => setActiveTab('staff-overview')}>
+            Overview
+          </button>
+          <p className="staff-eyebrow">Work records</p>
+          <h1>Proof of work</h1>
+          <p>Submit a file for a completed reporting period. This does not change your profile.</p>
+        </header>
+
+        <form className="staff-form-card staff-proof-form" onSubmit={submitProof}>
+          <div className="staff-form-section">
+            <div>
+              <h2>New submission</h2>
+              <p>PDF, Word document, or image. Maximum file size is 2 MB.</p>
             </div>
+            <div className="staff-form-fields">
+              <label>
+                Reporting period
+                <input
+                  required
+                  value={proofPeriod}
+                  onChange={(event) => setProofPeriod(event.target.value)}
+                  placeholder="For example, 15–28 July 2026"
+                />
+              </label>
+              <label>
+                Note <span className="staff-optional">Optional</span>
+                <textarea
+                  rows={3}
+                  value={proofNote}
+                  onChange={(event) => setProofNote(event.target.value)}
+                  placeholder="Add context for your reviewer"
+                />
+              </label>
+              <label className="staff-file-picker">
+                <Upload size={20} />
+                <span>
+                  <strong>{proofFile ? proofFile.name : 'Choose a file'}</strong>
+                  <small>{proofFile ? `${Math.ceil(proofFile.size / 1024)} KB selected` : 'PDF, DOC, DOCX, PNG, or JPG'}</small>
+                </span>
+                <input type="file" accept="image/png,image/jpeg,.pdf,.doc,.docx" onChange={chooseProofFile} />
+              </label>
+              {proofError && <p className="staff-form-error">{proofError}</p>}
+            </div>
+          </div>
+          <div className="staff-form-footer">
+            {proofSaved && <span className="staff-inline-success"><Check size={16} /> Proof saved</span>}
+            <button className="btn-primary" type="submit">Submit proof</button>
+          </div>
+        </form>
 
-            <label>
-              Current Task / Project Summary
-              <textarea rows={3} value={currentTask} onChange={(e) => setCurrentTask(e.target.value)} placeholder="Describe what you are currently working on..." />
-            </label>
+        <section className="staff-list-section">
+          <div className="staff-section-heading">
+            <div>
+              <p className="staff-eyebrow">History</p>
+              <h2>Previous submissions</h2>
+            </div>
+            <span>{proofSubmissions.length}</span>
+          </div>
+          {proofSubmissions.length === 0 ? (
+            <EmptyState icon={FileText} title="No proof submitted">
+              Your submitted files will appear here.
+            </EmptyState>
+          ) : (
+            <div className="staff-proof-list">
+              {proofSubmissions.map((submission) => (
+                <article className="staff-proof-row" key={submission.id}>
+                  <span className="staff-row-icon"><FileCheck2 size={19} /></span>
+                  <div>
+                    <strong>{submission.period}</strong>
+                    <p>{submission.note || submission.fileName}</p>
+                  </div>
+                  <div className="staff-proof-meta">
+                    <span>{formatDate(submission.submittedAt)}</span>
+                    {submission.fileData ? (
+                      <a href={submission.fileData} download={submission.fileName}>Download</a>
+                    ) : (
+                      <span>{submission.fileName}</span>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </section>
+    );
+  }
 
-            <label>
-              Upload Biweekly Proof of Work (Image / Document)
-              <input type="file" accept="image/*,.pdf,.doc,.docx" onChange={(e) => setProof(e.target.files?.[0]?.name || '')} />
-            </label>
+  if (activeTab === 'staff-payout-details') {
+    return (
+      <section className="staff-page staff-narrow-page">
+        <header className="staff-page-header">
+          <button className="staff-back-link" type="button" onClick={() => setActiveTab('staff-overview')}>
+            Overview
+          </button>
+          <p className="staff-eyebrow">Payouts</p>
+          <h1>Your wallet</h1>
+          <p>Use this address to receive Arc USDC. The balance shown comes from your connected Circle wallet.</p>
+        </header>
 
-            {proof && (
-              <div className="file-note" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0369a1', background: '#e0f2fe', padding: '10px', borderRadius: '8px' }}>
-                <FileUp size={16} /> Selected Proof: <strong>{proof}</strong>
-              </div>
+        <div className="staff-wallet-card">
+          <div className="staff-wallet-heading">
+            <div>
+              <span>Available balance</span>
+              <strong>{balanceAvailable ? `${currentUser.usdcBalance} USDC` : 'Unavailable'}</strong>
+            </div>
+            <span className={`staff-status ${walletReady ? 'is-ready' : ''}`}>
+              {walletReady ? 'Connected' : 'Not connected'}
+            </span>
+          </div>
+          <div className="staff-address-block">
+            <span>Arc wallet address</span>
+            <code>{walletReady ? walletAddress : 'No wallet address is available for this account.'}</code>
+            {walletReady && (
+              <button type="button" onClick={copyWallet}>
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied' : 'Copy address'}
+              </button>
             )}
-
-            {saved && (
-              <div className="success-note" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#166534', background: '#dcfce7', padding: '12px', borderRadius: '8px', fontWeight: 700 }}>
-                <CheckCircle size={18} /> Profile and proof submitted to Admin!
-              </div>
-            )}
-
-            <button className="btn-primary" type="submit" style={{ justifySelf: 'start', padding: '10px 24px' }}>
-              <Save size={17} /> Save Profile Details
-            </button>
-          </form>
+          </div>
+          <p className="staff-wallet-note">
+            Only send assets supported by your connected Arc wallet. Withdrawal is not shown until a real transaction flow is connected.
+          </p>
         </div>
+
+        <section className="staff-list-section">
+          <div className="staff-section-heading">
+            <div>
+              <p className="staff-eyebrow">Activity</p>
+              <h2>Payment history</h2>
+            </div>
+          </div>
+          {userTransactions.length === 0 ? (
+            <EmptyState icon={Inbox} title="No payments recorded">
+              Payments linked to your name or wallet will appear here.
+            </EmptyState>
+          ) : (
+            <div className="staff-transaction-list">
+              {userTransactions.map((transaction) => (
+                <article className="staff-transaction-row" key={transaction.id}>
+                  <div>
+                    <strong>{transaction.type}</strong>
+                    <span>{transaction.date}</span>
+                  </div>
+                  <div>
+                    <strong>{transaction.amount}</strong>
+                    <span>{transaction.status}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       </section>
     );
   }
 
   return (
-    <section className="staff-clean-page" style={{ display: 'grid', gap: '24px' }}>
-      {/* Header Banner */}
-      <div className="staff-welcome" style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', color: '#ffffff', padding: '28px', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+    <section className="staff-page">
+      <header className="staff-dashboard-header">
         <div>
-          <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, opacity: 0.9 }}>
-            Staff Dashboard
+          <p className="staff-eyebrow">Staff workspace</p>
+          <h1>{name ? `Welcome back, ${name.split(' ')[0]}` : 'Welcome to your workspace'}</h1>
+          <p>Review what needs your attention and keep your work records up to date.</p>
+        </div>
+        <button className="staff-profile-link" type="button" onClick={() => setActiveTab('staff-profile')}>
+          <span className="staff-avatar">{name ? name.charAt(0).toUpperCase() : <UserRound size={18} />}</span>
+          <span>
+            <strong>{name || 'Complete your profile'}</strong>
+            <small>{work || currentUser.email || 'No role added'}</small>
           </span>
-          <h1 style={{ margin: '4px 0 8px 0', fontSize: '1.8rem', color: '#ffffff' }}>
-            Welcome{currentUser.name ? `, ${currentUser.name}` : ''}!
-          </h1>
-          <p style={{ margin: 0, opacity: 0.9, fontSize: '0.95rem' }}>
-            Manage your Arc wallet, deposit/withdraw USDC, submit biweekly work proof, and view assigned tasks.
-          </p>
-        </div>
+          <ArrowRight size={17} />
+        </button>
+      </header>
 
-        {/* Action Buttons in Header */}
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn-secondary" onClick={() => setShowDepositModal(true)} style={{ background: '#ffffff', color: '#0284c7', fontWeight: 700 }}>
-            <ArrowDownRight size={18} /> Deposit
-          </button>
-          <button className="btn-primary" onClick={() => setShowWithdrawModal(true)} style={{ background: '#0f172a', borderColor: '#0f172a', color: '#ffffff', fontWeight: 700 }}>
-            <ArrowUpRight size={18} /> Withdraw
-          </button>
-        </div>
+      <div className="staff-attention-grid">
+        <button type="button" onClick={() => setActiveTab('staff-profile')}>
+          <span className="staff-action-icon"><UserRound size={20} /></span>
+          <span>
+            <small>Profile</small>
+            <strong>{profileComplete ? 'Details are up to date' : 'Complete your details'}</strong>
+          </span>
+          <span className={`staff-status ${profileComplete ? 'is-ready' : ''}`}>
+            {profileComplete ? 'Complete' : 'Action needed'}
+          </span>
+        </button>
+        <button type="button" onClick={() => setActiveTab('staff-work-proof')}>
+          <span className="staff-action-icon"><FileCheck2 size={20} /></span>
+          <span>
+            <small>Proof of work</small>
+            <strong>{proofSubmissions.length ? 'View your submissions' : 'Submit your first work record'}</strong>
+          </span>
+          <ArrowRight size={18} />
+        </button>
+        <button type="button" onClick={() => setActiveTab('staff-payout-details')}>
+          <span className="staff-action-icon"><Wallet size={20} /></span>
+          <span>
+            <small>Payout wallet</small>
+            <strong>{walletReady ? 'Wallet connected' : 'Wallet unavailable'}</strong>
+          </span>
+          <ArrowRight size={18} />
+        </button>
       </div>
 
-      {transactionSuccess && (
-        <div style={{ background: '#dcfce7', border: '1px solid #86efac', color: '#166534', padding: '14px', borderRadius: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <CheckCircle size={20} /> {transactionSuccess}
-        </div>
-      )}
-
-      {/* Main Grid: Wallet & Balance Panel */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-        {/* Wallet & Balance Card */}
-        <div className="card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Wallet size={24} color="#0284c7" />
-              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Arc Web3 Wallet</h3>
+      <div className="staff-overview-grid">
+        <section className="staff-list-section">
+          <div className="staff-section-heading">
+            <div>
+              <p className="staff-eyebrow">Work</p>
+              <h2>Assigned tasks</h2>
             </div>
-            <span style={{ fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', padding: '4px 10px', borderRadius: '12px', fontWeight: 700 }}>
-              ARC-TESTNET
-            </span>
+            <span>{tasks.length}</span>
           </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>
-              USDC Balance
-            </div>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
-              ${usdcBalance} <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 600 }}>USDC</span>
-            </div>
-          </div>
-
-          {/* Wallet Address Box */}
-          <div style={{ background: '#ffffff', padding: '12px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
-            <div style={{ overflow: 'hidden' }}>
-              <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>Your Wallet Address</div>
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', fontFamily: 'monospace', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                {walletAddress || 'Generating Arc wallet...'}
-              </div>
-            </div>
-            {walletAddress && (
-              <button onClick={handleCopyWallet} style={{ background: copied ? '#dcfce7' : '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, color: copied ? '#166534' : '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Copy size={14} /> {copied ? 'Copied' : 'Copy'}
-              </button>
-            )}
-          </div>
-
-          {/* Action Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
-            <button className="btn-secondary" onClick={() => setShowDepositModal(true)} style={{ justifyContent: 'center' }}>
-              <ArrowDownRight size={16} /> Deposit USDC
-            </button>
-            <button className="btn-primary" onClick={() => setShowWithdrawModal(true)} style={{ justifyContent: 'center' }}>
-              <ArrowUpRight size={16} /> Withdraw
-            </button>
-          </div>
-        </div>
-
-        {/* Profile Completion Shortcut Card */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-              <User size={24} color="#0284c7" />
-              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Profile & Work Proof</h3>
-            </div>
-            <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '16px' }}>
-              {profileComplete 
-                ? 'Your profile details are complete. Keep your biweekly work proof updated.' 
-                : 'Please complete your profile details and upload your work proof so the admin can review.'}
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                <span>Profile Status:</span>
-                <strong style={{ color: profileComplete ? '#166534' : '#d97706' }}>
-                  {profileComplete ? 'Complete' : 'Incomplete'}
-                </strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                <span>Work Proof:</span>
-                <strong>{proof ? proof : 'No file uploaded yet'}</strong>
-              </div>
-            </div>
-          </div>
-
-          <button className="btn-primary" onClick={() => setActiveTab('staff-profile')} style={{ marginTop: '20px', justifyContent: 'center' }}>
-            <FileUp size={16} /> Fill / Edit My Profile
-          </button>
-        </div>
-      </div>
-
-      {/* Transaction History & Assigned Tasks */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-        {/* Transaction History */}
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <History size={20} color="#0284c7" />
-            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Transaction History</h3>
-          </div>
-          {history.length === 0 ? (
-            <p className="muted-copy">No recent transactions recorded.</p>
+          {tasks.length === 0 ? (
+            <EmptyState icon={ClipboardList} title="Nothing assigned">
+              Tasks assigned by your employer will appear here.
+            </EmptyState>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {history.map((tx) => (
-                <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <div className="staff-task-list">
+              {tasks.map((task) => (
+                <article className="staff-task-row" key={task.id || task.title}>
+                  <span className="staff-row-icon"><BriefcaseBusiness size={18} /></span>
                   <div>
-                    <strong style={{ display: 'block', fontSize: '0.9rem', color: '#0f172a' }}>{tx.type}</strong>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{tx.date}</span>
+                    <strong>{task.title}</strong>
+                    {task.description && <p>{task.description}</p>}
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <strong style={{ display: 'block', fontSize: '0.95rem', color: tx.amount.startsWith('+') ? '#166534' : '#0f172a' }}>{tx.amount}</strong>
-                    <span style={{ fontSize: '0.75rem', background: '#dcfce7', color: '#166534', padding: '2px 6px', borderRadius: '6px', fontWeight: 700 }}>{tx.status}</span>
-                  </div>
-                </div>
+                  <span className="staff-status">{task.status || 'Open'}</span>
+                </article>
               ))}
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Assigned Tasks */}
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <ListTodo size={20} color="#0284c7" />
-            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Assigned Tasks</h3>
-          </div>
-          {tasks.length === 0 ? (
-            <p className="muted-copy">No tasks have been assigned by admin yet.</p>
-          ) : (
-            tasks.map((task) => (
-              <div className="task-row" key={task.id || task.title} style={{ padding: '10px 14px', background: '#f8fafc', borderRadius: '8px', marginBottom: '8px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
-                <strong>{task.title}</strong>
-                <span style={{ fontSize: '0.8rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '6px', fontWeight: 700 }}>{task.status || 'Open'}</span>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Deposit Modal */}
-      {showDepositModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000, padding: '20px' }}>
-          <div style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', maxWidth: '460px', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0 }}>Deposit USDC</h3>
-              <button onClick={() => setShowDepositModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>
-            </div>
-            <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '16px' }}>
-              Send Arc USDC to your dedicated wallet address below:
-            </p>
-            <div style={{ background: '#f1f5f9', padding: '12px', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.85rem', wordBreak: 'break-all', marginBottom: '16px', fontWeight: 700 }}>
-              {walletAddress || '0x20658b2bbc6abbea3bdb5912b2062a84695fbb85'}
-            </div>
-            <button className="btn-primary" onClick={handleCopyWallet} style={{ width: '100%', justifyContent: 'center' }}>
-              <Copy size={16} /> {copied ? 'Copied Address' : 'Copy Deposit Address'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Withdraw Modal */}
-      {showWithdrawModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000, padding: '20px' }}>
-          <div style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', maxWidth: '460px', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0 }}>Withdraw USDC</h3>
-              <button onClick={() => setShowWithdrawModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>
-            </div>
-            <form onSubmit={handleWithdrawSubmit} style={{ display: 'grid', gap: '14px' }}>
-              <label>
-                Destination Wallet Address
-                <input required value={withdrawAddress} onChange={(e) => setWithdrawAddress(e.target.value)} placeholder="0x..." style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-              </label>
-              <label>
-                Amount (USDC)
-                <input required type="number" step="any" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} placeholder="0.00" style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-              </label>
-              <button className="btn-primary" type="submit" style={{ justifyContent: 'center', marginTop: '10px' }}>
-                Confirm Withdrawal
+        <aside className="staff-side-panel">
+          <p className="staff-eyebrow">Latest record</p>
+          <h2>Proof of work</h2>
+          {proofSubmissions.length === 0 ? (
+            <>
+              <p>No work proof has been submitted from this account.</p>
+              <button className="btn-secondary" type="button" onClick={() => setActiveTab('staff-work-proof')}>
+                Add proof of work
               </button>
-            </form>
-          </div>
-        </div>
-      )}
+            </>
+          ) : (
+            <>
+              <div className="staff-latest-proof">
+                <FileCheck2 size={20} />
+                <div>
+                  <strong>{proofSubmissions[0].period}</strong>
+                  <span>Submitted {formatDate(proofSubmissions[0].submittedAt)}</span>
+                </div>
+              </div>
+              <button className="btn-secondary" type="button" onClick={() => setActiveTab('staff-work-proof')}>
+                View submissions
+              </button>
+            </>
+          )}
+        </aside>
+      </div>
     </section>
   );
 }

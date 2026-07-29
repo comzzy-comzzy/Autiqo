@@ -140,7 +140,7 @@ export default function StaffDashboard({
       }
     });
     setProfileSaved(true);
-    window.setTimeout(() => setProfileSaved(false), 2200);
+    setActiveTab('staff-overview');
   }
 
   function chooseProofFiles(event) {
@@ -195,7 +195,7 @@ export default function StaffDashboard({
       setProofFiles([]);
       event.target.reset();
       setProofSaved(true);
-      window.setTimeout(() => setProofSaved(false), 2600);
+      setActiveTab('staff-overview');
     } catch {
       setProofError('The selected files could not be saved. Check browser storage and try again.');
     } finally {

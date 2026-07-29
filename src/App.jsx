@@ -246,6 +246,10 @@ export default function App() {
                 ? records.map((record) => record.email === nextUser.email ? toStaffRecord(nextUser) : record)
                 : [...records, toStaffRecord(nextUser)]);
             }
+            if (userRole === 'staff') {
+              setShowProfileModal(false);
+              setActiveTab('staff-overview');
+            }
           }}
         />
       )}

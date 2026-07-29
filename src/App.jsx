@@ -19,6 +19,17 @@ import StaffDashboard from './components/StaffDashboard';
 import AuthModal from './components/AuthModal';
 import ProfileModal from './components/ProfileModal';
 
+const STAFF_SESSION_KEY = 'autiqo.staffSession';
+
+function readStaffSession() {
+  try {
+    const session = JSON.parse(window.localStorage.getItem(STAFF_SESSION_KEY) || 'null');
+    return session?.role === 'staff' && session.user?.email ? session : null;
+  } catch {
+    return null;
+  }
+}
+
 function toStaffRecord(user) {
   return {
     ...user,
@@ -126,13 +137,18 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
+  const [storedStaffSession] = useState(readStaffSession);
   const [activeTab, setActiveTab] = useState(isAdminRoute ? 'dashboard' : 'staff-overview');
   const [userRole, setUserRole] = useState(isAdminRoute ? 'admin' : 'staff');
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !isAdminRoute && Boolean(storedStaffSession));
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState({ name: '', email: '', company: '', profile: {}, tasks: [] });
+  const [currentUser, setCurrentUser] = useState(() => (
+    !isAdminRoute && storedStaffSession
+      ? storedStaffSession.user
+      : { name: '', email: '', company: '', profile: {}, tasks: [] }
+  ));
 
   const [workers, setWorkers] = useState([]);
   const [ledger, setLedger] = useState([]);
@@ -143,6 +159,15 @@ export default function App() {
   React.useEffect(() => {
     window.localStorage.setItem('autiqo.staffRecords', JSON.stringify(staffRecords));
   }, [staffRecords]);
+
+  React.useEffect(() => {
+    if (isAuthenticated && userRole === 'staff' && currentUser.email) {
+      window.localStorage.setItem(STAFF_SESSION_KEY, JSON.stringify({
+        role: 'staff',
+        user: currentUser
+      }));
+    }
+  }, [currentUser, isAuthenticated, userRole]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -178,6 +203,9 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    if (userRole === 'staff') {
+      window.localStorage.removeItem(STAFF_SESSION_KEY);
+    }
     setIsAuthenticated(false);
     setIsDrawerOpen(false);
     setShowProfileModal(false);

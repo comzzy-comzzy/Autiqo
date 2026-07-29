@@ -9,7 +9,9 @@ import {
   ShieldCheck,
   Users,
   Wallet,
-  Zap
+  Zap,
+  ArrowRight,
+  Check
 } from 'lucide-react';
 import NavigationDrawer from './components/NavigationDrawer';
 import PayrollWizard from './components/PayrollWizard';
@@ -24,44 +26,37 @@ function toStaffRecord(user) {
   };
 }
 
-function PublicLanding() {
+function PublicLanding({ onOpenAuth, isAdminRoute }) {
   return (
     <main className="public-page">
       <section className="public-hero">
-        <div className="public-hero-copy">
-          <div className="public-badge">
-            <Zap size={16} /> Workforce finance for African teams
-          </div>
-          <h1>Payroll and payouts for African teams, handled from one secure workspace.</h1>
-          <p>
-            Manage employee records, prepare payroll, track statutory deductions,
-            and settle cross-border contractor payments with fast USDC rails.
-          </p>
-          <div className="public-trust-row" aria-label="Autiqo coverage highlights">
-            <span>Nigeria PAYE</span>
-            <span>Ghana SSNIT</span>
-            <span>Arc USDC payouts</span>
-          </div>
+        <div className="public-hero-media" aria-hidden="true">
+          <img src="/african3.png" alt="" />
         </div>
-
-        <div className="public-hero-visual" aria-hidden="true">
-          <div className="public-slideshow">
-            <img src="/african1.png" alt="" className="public-slide" />
-            <img src="/african2.png" alt="" className="public-slide" />
-            <img src="/african3.png" alt="" className="public-slide" />
-          </div>
-          <div className="public-payroll-panel">
-            <div>
-              <span>Next payroll</span>
-              <strong>$42,800</strong>
+        <div className="public-hero-shade" aria-hidden="true" />
+        <div className="public-hero-inner">
+          <div className="public-hero-copy">
+            <div className="public-badge">Workforce operations across Africa</div>
+            <h1>One place to run payroll and support your people.</h1>
+            <p>
+              Autiqo brings employee records, payroll preparation, statutory deductions,
+              and contractor payouts into a clear, controlled workflow.
+            </p>
+            <div className="public-hero-actions">
+              <button className="public-primary-action" onClick={onOpenAuth}>
+                {isAdminRoute ? 'Access employer portal' : 'Access your workspace'}
+                <ArrowRight size={18} />
+              </button>
+              {!isAdminRoute && (
+                <a className="public-secondary-action" href="/admin">
+                  Employer sign in
+                </a>
+              )}
             </div>
-            <div>
-              <span>Workers ready</span>
-              <strong>128</strong>
-            </div>
-            <div>
-              <span>Settlement rail</span>
-              <strong>Arc USDC</strong>
+            <div className="public-trust-row" aria-label="Autiqo product capabilities">
+              <span><Check size={15} /> Employee records</span>
+              <span><Check size={15} /> Payroll controls</span>
+              <span><Check size={15} /> Payout tracking</span>
             </div>
           </div>
         </div>
@@ -69,48 +64,58 @@ function PublicLanding() {
 
       <section className="public-section public-problem">
         <div>
-          <span className="section-kicker">For employers</span>
-          <h2>Run payroll with the right records in place.</h2>
+          <span className="section-kicker">Built for the work behind payday</span>
+          <h2>Keep every payroll decision connected to the right record.</h2>
         </div>
         <p>
-          Autiqo is built for companies managing staff and contractors across African
-          markets. Keep salary, tax, pension, and payout data organized before each run.
+          From onboarding a new employee to reviewing a completed payment, Autiqo gives
+          operators a consistent process and gives employees a dependable place to find
+          the information that matters to them.
         </p>
       </section>
 
       <section className="public-feature-grid">
         <article className="public-feature-card">
           <Building2 size={22} />
-          <h3>Employer command center</h3>
-          <p>Register a workforce, prepare payroll, and track country-specific deductions.</p>
+          <span>01</span>
+          <h3>Maintain a reliable workforce record</h3>
+          <p>Keep employment details, compensation, documents, and payout information together.</p>
         </article>
         <article className="public-feature-card">
           <Banknote size={22} />
-          <h3>Cross-border payout runs</h3>
-          <p>Move from payroll approval to fast contractor settlement through Web3 rails.</p>
+          <span>02</span>
+          <h3>Prepare payroll with oversight</h3>
+          <p>Review earnings and deductions before approving a payroll run for payment.</p>
         </article>
         <article className="public-feature-card">
           <ShieldCheck size={22} />
-          <h3>Compliance records</h3>
-          <p>Keep salary, tax, pension, and audit data organized in the protected portal.</p>
+          <span>03</span>
+          <h3>Give people a clearer experience</h3>
+          <p>Employees can view pay information, manage their profile, and follow payout activity.</p>
         </article>
       </section>
 
       <section className="public-split-section">
-        <div>
-          <span className="section-kicker">Private portal</span>
-          <h2>Operational screens stay behind sign-in.</h2>
+        <div className="public-split-copy">
+          <span className="section-kicker">Separate access, shared records</span>
+          <h2>A focused workspace for every role.</h2>
           <p>
-            Employers see payroll execution, worker directories, treasury rails, and
-            compliance controls after sign-in. Employees see their pay, payslips,
-            payout destination, and profile details after sign-in.
+            Employer tools and employee information stay distinct, while the underlying
+            records remain connected. Each person sees the work that belongs to them.
           </p>
+          <button className="public-text-action" onClick={onOpenAuth}>
+            Continue to secure sign in <ArrowRight size={17} />
+          </button>
         </div>
         <div className="protected-list">
-          <div><LockKeyhole size={18} /> Payroll execution</div>
-          <div><LockKeyhole size={18} /> Worker directory</div>
-          <div><LockKeyhole size={18} /> Employee payslips</div>
-          <div><LockKeyhole size={18} /> Profile settings</div>
+          <div>
+            <LockKeyhole size={19} />
+            <span><strong>Employer workspace</strong>People, payroll, deductions, and payment review</span>
+          </div>
+          <div>
+            <Users size={19} />
+            <span><strong>Employee workspace</strong>Pay details, personal records, and payout activity</span>
+          </div>
         </div>
       </section>
     </main>
@@ -185,8 +190,8 @@ export default function App() {
     <>
       <div className={`splash-container ${!showSplash ? 'slide-out' : ''}`}>
         <img src="/logo-icon.png" alt="Autiqo Logo" className="splash-logo" />
-        <h1 className="splash-title">Autiqo AI</h1>
-        <p className="splash-subtitle">Autonomous Workforce Finance & Cross-Border Payouts</p>
+        <h1 className="splash-title">Autiqo</h1>
+        <p className="splash-subtitle">Payroll and workforce operations</p>
       </div>
 
       {showAuthModal && (
@@ -240,8 +245,9 @@ export default function App() {
           <div className="nav-right">
             {!isAuthenticated ? (
               <div className="public-nav-actions">
-                <button className="btn-primary nav-cta" onClick={openAuth} style={{ background: '#0284c7', borderColor: '#0284c7', color: '#ffffff', fontWeight: 700 }}>
-                  Sign In / Sign Up
+                {!isAdminRoute && <a href="/admin" className="nav-employer-link">For employers</a>}
+                <button className="nav-cta" onClick={openAuth}>
+                  Sign in <ArrowRight size={16} />
                 </button>
               </div>
             ) : (
@@ -470,11 +476,11 @@ export default function App() {
             )}
           </main>
         ) : (
-          <PublicLanding />
+          <PublicLanding onOpenAuth={openAuth} isAdminRoute={isAdminRoute} />
         )}
 
         <footer className="app-footer">
-          <p>© 2026 Autiqo AI Inc. • Autonomous Workforce Finance & Cross-Border Payout Platform</p>
+          <p>© 2026 Autiqo. Payroll and workforce operations for African teams.</p>
         </footer>
       </div>
     </>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
+  ArrowRight,
   CheckCircle,
   Mail,
   ShieldCheck,
@@ -44,7 +45,7 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
   const [deviceId, setDeviceId] = useState('');
   const [wallet, setWallet] = useState(null);
   const [usdcBalance, setUsdcBalance] = useState(null);
-  const [statusMessage, setStatusMessage] = useState('Enter your email to recover or create your Arc wallet.');
+  const [statusMessage, setStatusMessage] = useState('We will email you a one-time code. No password required.');
   const [errorMessage, setErrorMessage] = useState('');
   const [isBusy, setIsBusy] = useState(false);
 
@@ -239,7 +240,7 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
   }
 
   return (
-    <div className="auth-modal-overlay">
+    <div className="auth-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <div className="auth-modal-card">
         <button className="auth-close" onClick={onClose} aria-label="Close">
           <X size={18} />
@@ -247,8 +248,9 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
 
         <div className="auth-brand">
           <img src="/logo-icon.png" alt="Autiqo Logo" />
-          <h2>{adminOnly ? 'Admin Sign In / Sign Up' : 'Staff Sign In / Sign Up'}</h2>
-          <p>Sign in or sign up with your email to access your dashboard and Arc Web3 wallet.</p>
+          <span>{adminOnly ? 'Employer workspace' : 'Employee workspace'}</span>
+          <h2 id="auth-title">Welcome to Autiqo</h2>
+          <p>Enter your work email to securely access your account.</p>
         </div>
 
         {errorMessage && (
@@ -257,14 +259,14 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
           </div>
         )}
 
-        <div className="auth-alert info">
+        <div className="auth-alert info" aria-live="polite">
           {wallet ? <CheckCircle size={16} /> : <ShieldCheck size={16} />}
           {statusMessage}
         </div>
 
         <form onSubmit={handleSendOtp} className="auth-wallet-form">
           <label>
-            Email Address
+            Work email
             <span>
               <Mail size={17} />
               <input
@@ -272,17 +274,21 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="your.email@company.com"
+                placeholder="name@company.com"
+                autoComplete="email"
               />
             </span>
           </label>
 
-          <div className="auth-action-grid single" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="auth-action-grid single">
             <button type="submit" className="btn-primary" disabled={isBusy}>
-              <Mail size={17} /> {isBusy ? 'Sending code...' : 'Send email code'}
+              {isBusy ? 'Sending code...' : 'Continue with email'} <ArrowRight size={17} />
             </button>
           </div>
         </form>
+        <p className="auth-privacy-note">
+          By continuing, you agree to use Autiqo for authorized workplace access.
+        </p>
       </div>
     </div>
   );

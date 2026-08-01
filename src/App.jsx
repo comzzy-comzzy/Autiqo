@@ -229,6 +229,20 @@ export default function App() {
     setActiveTab(userPayload.role === 'admin' ? 'dashboard' : 'staff-overview');
   };
 
+  const handleAdminLogin = (email) => {
+    setUserRole('admin');
+    setCurrentUser({
+      name: 'Employer Admin',
+      email,
+      company: 'Autiqo Workspace',
+      profile: {},
+      tasks: []
+    });
+    setIsAuthenticated(true);
+    setAdminUnlocked(true);
+    setActiveTab('dashboard');
+  };
+
   const handleLogout = () => {
     if (userRole === 'staff') {
       window.localStorage.removeItem(STAFF_SESSION_KEY);
@@ -242,7 +256,13 @@ export default function App() {
     setActiveTab('staff-overview');
   };
 
-  const openAuth = () => setShowAuthModal(true);
+  const openAuth = () => {
+    if (isAdminRoute) {
+      document.getElementById('admin-email')?.focus();
+      return;
+    }
+    setShowAuthModal(true);
+  };
 
   return (
     <>
@@ -256,8 +276,7 @@ export default function App() {
         <AuthModal
           onLogin={handleLogin}
           onClose={() => setShowAuthModal(false)}
-          initialAccountType={isAdminRoute ? 'client' : 'contractor'}
-          adminOnly={isAdminRoute}
+          initialAccountType="contractor"
         />
       )}
 
@@ -378,8 +397,6 @@ export default function App() {
                   }
                 }}
               />
-            ) : !adminUnlocked ? (
-              <AdminAccessGate email={currentUser.email} onUnlocked={() => setAdminUnlocked(true)} />
             ) : activeTab === 'dashboard' || activeTab === 'people' ? (
               <AdminDashboard adminEmail={currentUser.email} localRecords={staffRecords} />
             ) : (
@@ -552,8 +569,10 @@ export default function App() {
               </>
             )}
           </main>
+        ) : isAdminRoute ? (
+          <main className="main-wrapper"><AdminAccessGate email="" onUnlocked={handleAdminLogin} /></main>
         ) : (
-          <PublicLanding onOpenAuth={openAuth} isAdminRoute={isAdminRoute} />
+          <PublicLanding onOpenAuth={openAuth} isAdminRoute={false} />
         )}
 
         <footer className="app-footer">

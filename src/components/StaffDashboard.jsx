@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { upload } from '@vercel/blob/client';
 import {
   ArrowDownToLine,
   ArrowRight,
@@ -49,6 +50,17 @@ async function storeProofFiles(files) {
   database.close();
 }
 
+async function uploadSharedProof(file, submissionId, userToken) {
+  return upload(`autiqo/proof/${submissionId}/${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`, file, {
+    access: 'private',
+    handleUploadUrl: '/api/staff-proof-upload',
+    clientPayload: JSON.stringify({ submissionId }),
+    headers: { 'x-user-token': userToken },
+    multipart: file.size > 8 * 1024 * 1024,
+    contentType: file.type || 'application/octet-stream'
+  });
+}
+
 async function getProofFile(id) {
   const database = await openProofDatabase();
   const record = await new Promise((resolve, reject) => {
@@ -92,6 +104,7 @@ export default function StaffDashboard({
   activeTab,
   setActiveTab,
   currentUser = {},
+  circleUserToken = '',
   ledger = [],
   onUpdateUser = () => {}
 }) {
@@ -193,11 +206,21 @@ export default function StaffDashboard({
       }));
       await storeProofFiles(storedFiles);
 
+      const sharedFiles = [];
+      for (const file of proofFiles) {
+        try {
+          sharedFiles.push(await uploadSharedProof(file, submissionId, circleUserToken));
+        } catch {
+          // Local browser storage remains available if shared storage is not configured.
+          sharedFiles.push(null);
+        }
+      }
+
       const submission = {
         id: submissionId,
         period: proofDate,
         fileName: proofFiles.length === 1 ? proofFiles[0].name : `${proofFiles.length} files`,
-        files: storedFiles.map(({ blob, ...file }) => file),
+        files: storedFiles.map(({ blob, ...file }, index) => ({ ...file, ...(sharedFiles[index] || {}) })),
         submittedAt: new Date().toISOString()
       };
 

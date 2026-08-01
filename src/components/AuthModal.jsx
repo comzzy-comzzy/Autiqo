@@ -194,7 +194,8 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
       country,
       authProvider: 'circle-user-controlled-wallet',
       wallet: primaryWallet,
-      usdcBalance: balance
+      usdcBalance: balance,
+      circleUserToken: loginResultRef.current?.userToken || ''
     });
     onClose();
   }
@@ -249,8 +250,8 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
         <div className="auth-brand">
           <img src="/logo-icon.png" alt="Autiqo Logo" />
           <span>{adminOnly ? 'Employer workspace' : 'Employee workspace'}</span>
-          <h2 id="auth-title">Welcome to Autiqo</h2>
-          <p>Enter your work email to securely access your account.</p>
+          <h2 id="auth-title">Sign in or create an account</h2>
+          <p>Use your work email to continue. Circle signs you in if your account exists, or creates one if you are new.</p>
         </div>
 
         {errorMessage && (
@@ -282,7 +283,7 @@ export default function AuthModal({ onLogin, onClose, initialAccountType = 'cont
 
           <div className="auth-action-grid single">
             <button type="submit" className="btn-primary" disabled={isBusy}>
-              {isBusy ? 'Sending code...' : 'Continue with email'} <ArrowRight size={17} />
+              {isBusy ? 'Sending code...' : 'Sign in or create account'} <ArrowRight size={17} />
             </button>
           </div>
         </form>

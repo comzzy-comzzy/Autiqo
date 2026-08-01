@@ -18,6 +18,8 @@ import PayrollWizard from './components/PayrollWizard';
 import StaffDashboard from './components/StaffDashboard';
 import AuthModal from './components/AuthModal';
 import ProfileModal from './components/ProfileModal';
+import AdminDashboard from './components/AdminDashboard';
+import AdminAccessGate from './components/AdminAccessGate';
 
 const STAFF_SESSION_KEY = 'autiqo.staffSession';
 
@@ -153,6 +155,8 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => !isAdminRoute && Boolean(storedStaffSession));
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [circleUserToken, setCircleUserToken] = useState('');
   const [currentUser, setCurrentUser] = useState(() => (
     !isAdminRoute && storedStaffSession
       ? storedStaffSession.user
@@ -179,6 +183,18 @@ export default function App() {
   }, [currentUser, isAuthenticated, userRole]);
 
   React.useEffect(() => {
+    if (!isAuthenticated || userRole !== 'staff' || !circleUserToken || !currentUser.email || !currentUser.wallet?.address) return;
+    const timer = window.setTimeout(() => {
+      fetch('/api/staff-records', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ record: toStaffRecord(currentUser), userToken: circleUserToken })
+      }).catch(() => {});
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [circleUserToken, currentUser, isAuthenticated, userRole]);
+
+  React.useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
     }, 1200);
@@ -186,6 +202,7 @@ export default function App() {
   }, []);
 
   const handleLogin = (userPayload) => {
+    setCircleUserToken(userPayload.circleUserToken || '');
     setUserRole(userPayload.role);
     setCurrentUser({
       name: userPayload.name,
@@ -217,6 +234,9 @@ export default function App() {
       window.localStorage.removeItem(STAFF_SESSION_KEY);
     }
     setIsAuthenticated(false);
+    setAdminUnlocked(false);
+    setCircleUserToken('');
+    if (userRole === 'admin') fetch('/api/admin-session', { method: 'DELETE' }).catch(() => {});
     setIsDrawerOpen(false);
     setShowProfileModal(false);
     setActiveTab('staff-overview');
@@ -345,6 +365,7 @@ export default function App() {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 currentUser={currentUser}
+                circleUserToken={circleUserToken}
                 ledger={ledger}
                 onUpdateUser={(updated) => {
                   const nextUser = { ...currentUser, ...updated };
@@ -357,6 +378,10 @@ export default function App() {
                   }
                 }}
               />
+            ) : !adminUnlocked ? (
+              <AdminAccessGate email={currentUser.email} onUnlocked={() => setAdminUnlocked(true)} />
+            ) : activeTab === 'dashboard' || activeTab === 'people' ? (
+              <AdminDashboard adminEmail={currentUser.email} localRecords={staffRecords} />
             ) : (
               <>
                 <div className="hero-card employer-hero">

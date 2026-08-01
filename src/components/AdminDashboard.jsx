@@ -12,8 +12,8 @@ function formatSize(bytes) {
   return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.ceil(bytes / 1024)} KB`;
 }
 
-export default function AdminDashboard({ adminEmail, localRecords = [] }) {
-  const [records, setRecords] = useState(localRecords);
+export default function AdminDashboard({ adminEmail }) {
+  const [records, setRecords] = useState([]);
   const [selectedEmail, setSelectedEmail] = useState('');
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ export default function AdminDashboard({ adminEmail, localRecords = [] }) {
       setRecords(data.records || []);
     } catch (loadError) {
       setError(loadError.message);
-      setRecords((current) => current.length ? current : localRecords);
+      setRecords([]);
     } finally {
       setLoading(false);
     }

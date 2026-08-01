@@ -398,7 +398,7 @@ export default function App() {
                 }}
               />
             ) : activeTab === 'dashboard' || activeTab === 'people' ? (
-              <AdminDashboard adminEmail={currentUser.email} localRecords={staffRecords} />
+              <AdminDashboard adminEmail={currentUser.email} />
             ) : (
               <>
                 <div className="hero-card employer-hero">
